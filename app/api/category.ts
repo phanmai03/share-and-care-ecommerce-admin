@@ -6,9 +6,14 @@ import get from 'lodash/get';
 
 const CATEGORY_URL = '/categories';
 
-export const createCategories = async (data: Category.CategoryData): Promise<Category.CategoriesDataResponse> => {
+export const createCategories = async (data: Category.CategoryData, clientId: string, accessToken: string): Promise<Category.CategoriesDataResponse> => {
     try {
-        const response = await api.post(`${CATEGORY_URL}`, data);
+        const response = await api.post(`${CATEGORY_URL}`, data, {
+            headers: {
+                'x-client-id': clientId,
+                'Authorization': accessToken
+            }
+        });
         return response.data.metadata;
     } catch (error) {
         const errorMessage = get(error, 'response.data.error.message', '');

@@ -6,7 +6,7 @@ export interface CategoryData {
 export interface CategoriesDataResponse{
     id: string,
     name: string,
-    parentId: null,
+    parentId: null | string,
 }
 export interface CategoryDataResponse {
     id: string,

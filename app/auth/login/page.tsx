@@ -35,9 +35,9 @@ const LoginForm = () => {
                 password: formData.password,
             });
 
-            // Save tokens in localStorage
-            localStorage.setItem("accessToken", response.tokens.accessToken);
-            localStorage.setItem("refreshToken", response.tokens.refreshToken);
+            // Save tokens in sessionStorage
+            sessionStorage.setItem("accessToken", response.tokens.accessToken);
+            sessionStorage.setItem("refreshToken", response.tokens.refreshToken);
             setIsLogin(true);
 
             // Check if the user is an admin

@@ -6,10 +6,12 @@ import { createCategories, getAllCategories } from "@/app/api/category";
 export default function CategoryForm() {
   const [formData, setFormData] = useState<CategoryData>({
     name: "",
-    parentId:"",
+    parentId: "",
   });
   const [categories, setCategories] = useState<CategoryDataResponse[]>([]);
   const [loading, setLoading] = useState(false);
+  const accessToken = sessionStorage.getItem('accessToken');
+  const id = process.env.NEXT_PUBLIC_ADMIN_ID;
 
   // Fetch all categories for the parent dropdown
   useEffect(() => {
@@ -17,6 +19,7 @@ export default function CategoryForm() {
       try {
         const response = await getAllCategories();
         setCategories(response);
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
       } catch (error) {
         toast.error("Failed to fetch categories.");
       }
@@ -31,16 +34,21 @@ export default function CategoryForm() {
       [name]: value,
     }));
   };
-  console.log(formData)
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setLoading(true);
     try {
-      const response = await createCategories(formData);
-
-      toast.success("Category added successfully.");
-      setFormData({ name: "", parentId: "" }); // Reset form
+      if (id !== undefined && accessToken !== null) {
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        const response = await createCategories({
+          name: formData.name,
+          parentId: formData.parentId,
+        }, id, accessToken);
+        toast.success("Category added successfully.");
+        setFormData({ name: "", parentId: "" }); // Reset form
+      }
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
       toast.error("Error creating category.");
     } finally {
@@ -94,9 +102,8 @@ export default function CategoryForm() {
           <button
             type="submit"
             disabled={loading}
-            className={`py-2 px-6 rounded-md text-white ${
-              loading ? "bg-gray-400 cursor-not-allowed" : "bg-blue-500"
-            }`}
+            className={`py-2 px-6 rounded-md text-white ${loading ? "bg-gray-400 cursor-not-allowed" : "bg-blue-500"
+              }`}
           >
             {loading ? "Processing..." : "Create"}
           </button>
