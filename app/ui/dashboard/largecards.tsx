@@ -17,7 +17,7 @@ interface OrderStats {
       {
         period: "Yesterday Orders",
         sales: 130000,
-        color: "bg-green-600",
+        color: "bg-blue-600",
       },
       {
         period: "This Month",

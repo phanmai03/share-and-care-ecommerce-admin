@@ -15,7 +15,6 @@ import {
   HousePlus,
   Settings,
   ListTodo,
-  LogOut,
 } from "lucide-react";
 
 // Type the props for Sidebar component
@@ -41,16 +40,13 @@ const Sidebar: React.FC<SidebarProps> = ({ showSidebar, setShowSidebar }) => {
     { title: "Return Policy", icon: Settings, href: "/dashboard/return-policy" },
   ];
 
-  const handleLogout = () => {
-    // Add logout logic here (e.g., API call or clearing tokens)
-    console.log("Logging out...");
-  };
+
 
   return (
     <div
   className={`${
     showSidebar ? "block" : "hidden"
-  } lg:block sm:mt-0 bg-white space-y-6 w-60 h-screen text-black fixed left-0 top-0 shadow-md z-40`}
+  } sm:mt-0 bg-white space-y-6 w-60 h-screen text-lg fixed left-0 min-[0px]:top-20 lg:top-0 shadow-md z-40`}
 >
       <div className="px-6 py-4">
         <Link href="#">
@@ -63,7 +59,7 @@ const Sidebar: React.FC<SidebarProps> = ({ showSidebar, setShowSidebar }) => {
           <Link
             key={i}
             href={item.href}
-            onClick={() => setShowSidebar(false)} // Close sidebar on link click
+            onClick={() => setShowSidebar(true)} // Close sidebar on link click
             className={`flex items-center space-x-3 px-6 py-2 hover:border-green-600 hover:bg-gray-100 transition-all ${
               pathname === item.href ? "bg-gray-100" : ""
             }`}
@@ -72,14 +68,6 @@ const Sidebar: React.FC<SidebarProps> = ({ showSidebar, setShowSidebar }) => {
             <span>{item.title}</span>
           </Link>
         ))}
-      </div>
-
-      <div
-        className="flex items-center space-x-3 px-6 py-2 hover:border-green-600 hover:bg-gray-100 transition-all cursor-pointer"
-        onClick={handleLogout}
-      >
-        <LogOut size={24} />
-        <span>Logout</span>
       </div>
     </div>
   );

@@ -1,17 +1,18 @@
-import * as Auth from "@/interface/auth"
+import * as Category from "@/interface/category"
 
 import { toast } from 'react-toastify';
 import api from './index';
 import get from 'lodash/get';
 
-const AUTH_URL = '/auth';
+const CATEGORY_URL = '/categories';
 
-export const resendEmailVerification = async (data: Auth.ResendData): Promise<Auth.ResendDataResponse> => {
+export const createCategories = async (data: Category.CategoryData): Promise<Category.CategoriesDataResponse> => {
     try {
-        const response = await api.post(`${AUTH_URL}/resend-email-verification`, data);
+        const response = await api.post(`${CATEGORY_URL}`, data);
         return response.data.metadata;
     } catch (error) {
         const errorMessage = get(error, 'response.data.error.message', '');
+
         if (errorMessage) {
             toast.error(errorMessage);
         }
@@ -19,12 +20,42 @@ export const resendEmailVerification = async (data: Auth.ResendData): Promise<Au
     }
 };
 
-export const loginRequest = async (data: Auth.LoginData): Promise<Auth.LoginDataResponse> => {
+
+export const getAllCategories = async (): Promise<Array<Category.CategoryDataResponse>> => {
     try {
-        const response = await api.post(`${AUTH_URL}/login`, data);
+        const response = await api.get(`${CATEGORY_URL}/all`);
         return response.data.metadata;
     } catch (error) {
         const errorMessage = get(error, 'response.data.error.message', '');
+
+        if (errorMessage) {
+            toast.error(errorMessage);
+        }
+        throw new Error(errorMessage || 'An unknown error occurred.');
+    }
+}
+
+export const getChildCategories = async (data: string): Promise<Array<Category.CategoryDataResponse>> => {
+    try {
+        const response = await api.get(`${CATEGORY_URL}/?parentId=${data}`);
+        return response.data.metadata;
+    } catch (error) {
+        const errorMessage = get(error, 'response.data.error.message', '');
+
+        if (errorMessage) {
+            toast.error(errorMessage);
+        }
+        throw new Error(errorMessage || 'An unknown error occurred.');
+    }
+}
+
+export const deleteCategories = async (data: string) => {
+    try {
+        const response = await api.delete(`${CATEGORY_URL}/?categoryId=${data}`);
+        return response.data.metadata;
+    } catch (error) {
+        const errorMessage = get(error, 'response.data.error.message', '');
+
         if (errorMessage) {
             toast.error(errorMessage);
         }
@@ -32,34 +63,13 @@ export const loginRequest = async (data: Auth.LoginData): Promise<Auth.LoginData
     }
 };
 
-export const checkAdmin = async (clientId: string, accessToken: string) => {
+export const updateCategories = async (data: Category.CategoryData): Promise<Array<Category.CategoriesDataResponse>> => {
     try {
-        const response = await api.get(`${AUTH_URL}/admin-panel`, {
-            headers: {
-                'x-client-id': clientId,
-                'Authorization': accessToken,
-            },
-        });
-        return response.data.metadata;
-    } catch (error) {
-        const errorMessage = get(error, 'response.data.error.message', 'An unknown error occurred.');
-        toast.error(errorMessage);
-        throw new Error(errorMessage);
-    }
-};
-
-
-export const logoutRequest = async (clientId: string, accessToken: string) => {
-    try {
-        const response = await api.post(`${AUTH_URL}/logout`, null, {
-            headers: {
-                'x-client-id': clientId,
-                'Authorization': accessToken
-            }
-        });
+        const response = await api.patch(`${CATEGORY_URL}` , data);
         return response.data.metadata;
     } catch (error) {
         const errorMessage = get(error, 'response.data.error.message', '');
+
         if (errorMessage) {
             toast.error(errorMessage);
         }
@@ -67,29 +77,4 @@ export const logoutRequest = async (clientId: string, accessToken: string) => {
     }
 };
 
-export const forgotPassword = async (data: Auth.ForgotPasswordData) => {
-    try {
-        const response = await api.post(`${AUTH_URL}/forgot-password`, data);
-        return response.data.metadata;
-    } catch (error) {
-        const errorMessage = get(error, 'response.data.error.message', '');
-        if (errorMessage) {
-            toast.error(errorMessage);
-        }
-        throw new Error(errorMessage || 'An unknown error occurred.');
-    }
-};
-
-export const resetPassword = async (data: Auth.ResetPasswordData) => {
-    try {
-        const response = await api.post(`${AUTH_URL}/reset-password`, data);
-        return response.data.metadata;
-    } catch (error) {
-        const errorMessage = get(error, 'response.data.error.message', '');
-        if (errorMessage) {
-            toast.error(errorMessage);
-        }
-        throw new Error(errorMessage || 'An unknown error occurred.');
-    }
-};
 

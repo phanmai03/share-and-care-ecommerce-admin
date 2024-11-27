@@ -1,7 +1,7 @@
 import React from 'react'
-import Heading from '../ui/heading'
-import LargeCards from '../ui/dashboard/largecards'
-import SmallCards from '../ui/dashboard/smallcards'
+import Heading from '@/app/ui/heading'
+import LargeCards from '@/app/ui/dashboard/largecards'
+import SmallCards from '@/app/ui/dashboard/smallcards'
 
 export default function page() {
   return (
