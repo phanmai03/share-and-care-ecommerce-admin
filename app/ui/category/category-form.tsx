@@ -1,113 +1,149 @@
 import { useState, useEffect } from "react";
 import { CategoryData, CategoryDataResponse } from "@/interface/category";
 import { toast } from "react-toastify";
-import { createCategories, getAllCategories } from "@/app/api/category";
+import { createCategories, getAllCategories, updateCategories } from "@/app/api/category";
 
-export default function CategoryForm() {
+interface CategoryFormProps {
+  category: CategoryDataResponse | null;
+}
+
+export default function CategoryForm({ category }: CategoryFormProps) {
   const [formData, setFormData] = useState<CategoryData>({
     name: "",
-    parentId: "",
+    parentId: null, // Allow null for no parent category
   });
   const [categories, setCategories] = useState<CategoryDataResponse[]>([]);
   const [loading, setLoading] = useState(false);
-  const accessToken = sessionStorage.getItem('accessToken');
+  const accessToken = sessionStorage.getItem("accessToken");
   const id = process.env.NEXT_PUBLIC_ADMIN_ID;
 
-  // Fetch all categories for the parent dropdown
   useEffect(() => {
     const fetchCategories = async () => {
       try {
         const response = await getAllCategories();
         setCategories(response);
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       } catch (error) {
         toast.error("Failed to fetch categories.");
       }
     };
-    fetchCategories();
-  }, []);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    fetchCategories();
+
+    if (category) {
+      setFormData({
+        name: category.name,
+        parentId: category.parentId || null,
+      });
+    } else {
+      setFormData({
+        name: "",
+        parentId: null,
+      });
+    }
+  }, [category]);
+
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
       ...prev,
-      [name]: value,
+      [name]: value === "" ? null : value, // Convert "" to null for parentId
     }));
   };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setLoading(true);
+  
     try {
-      if (id !== undefined && accessToken !== null) {
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        const response = await createCategories({
+      if (id && accessToken) {
+        const payload = {
           name: formData.name,
-          parentId: formData.parentId,
-        }, id, accessToken);
-        toast.success("Category added successfully.");
-        setFormData({ name: "", parentId: "" }); // Reset form
+          parentId: formData.parentId || null, // Ensure parentId is either a string or null
+        };
+  
+        if (category) {
+          // Include categoryId explicitly in the payload for updates
+          await updateCategories(
+            { ...payload, categoryId: category.id }, // Use category.id, not formData.categoryId
+            id,
+            accessToken
+          );
+          toast.success("Category updated successfully.");
+        } else {
+          // Create category
+          await createCategories(payload, id, accessToken);
+          toast.success("Category added successfully.");
+        }
+  
+        // Reset form after success
+        setFormData({ name: "", parentId: null });
+      } else {
+        toast.error("Missing ID or access token.");
       }
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
-      toast.error("Error creating category.");
+      toast.error("Error submitting category. Please try again.");
     } finally {
       setLoading(false);
     }
   };
+  
 
   return (
-    <div className="bg-white rounded-lg shadow-md p-6 max-w-lg w-full">
-      <h2 className="text-lg font-semibold mb-4">Create Category</h2>
+    <div className="bg-white rounded-lg p-6 max-w-lg w-full">
+      <h3 className="text-lg font-semibold mb-4">
+        {category ? "Edit Category" : "Add Category"}
+      </h3>
       <form onSubmit={handleSubmit}>
-        {/* Category Name Input */}
         <div className="mb-4">
-          <label htmlFor="name" className="block text-sm font-medium text-gray-700">
+          <label htmlFor="name" className="block text-sm font-medium">
             Category Name
           </label>
           <input
+            type="text"
             id="name"
             name="name"
-            type="text"
             value={formData.name}
             onChange={handleChange}
-            className="border border-gray-300 rounded-md p-2 w-full"
+            className="w-full p-2 mt-1 border rounded-md"
             required
           />
         </div>
 
-        {/* Parent Category Select */}
         <div className="mb-4">
-          <label htmlFor="parentId" className="block text-sm font-medium text-gray-700">
+          <label htmlFor="parentId" className="block text-sm font-medium">
             Parent Category
           </label>
           <select
             id="parentId"
             name="parentId"
-            value={formData.parentId !== null ? formData.parentId : "None"}
+            value={formData.parentId ?? ""} // Display null as empty string
             onChange={handleChange}
-            className="border border-gray-300 rounded-md p-2 w-full"
+            className="w-full p-2 mt-1 border rounded-md"
           >
             <option value="">None</option>
-            {categories.map((category) => (
-              <option key={category.id} value={category.id}>
-                {category.name}
+            {categories.map((cat) => (
+              <option key={cat.id} value={cat.id}>
+                {cat.name}
               </option>
             ))}
           </select>
         </div>
 
-        {/* Submit Button */}
-        <div className="flex justify-end">
-          <button
-            type="submit"
-            disabled={loading}
-            className={`py-2 px-6 rounded-md text-white ${loading ? "bg-gray-400 cursor-not-allowed" : "bg-blue-500"
-              }`}
-          >
-            {loading ? "Processing..." : "Create"}
-          </button>
-        </div>
+        <button
+          type="submit"
+          disabled={loading}
+          className="w-full py-2 px-4 bg-teal-500 text-white rounded-md"
+        >
+          {loading
+            ? "Saving..."
+            : category
+            ? "Update Category"
+            : "Add Category"}
+        </button>
       </form>
     </div>
   );

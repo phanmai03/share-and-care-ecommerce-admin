@@ -1,37 +1,54 @@
 "use client";
 
-import React, { useState, useCallback, useMemo } from "react";
+import { ProductData } from "@/interface/product";
+import React, { useState, useMemo, useCallback } from "react";
 
-interface VariantGroup {
-  id: number;
+interface VariantProps {
+  formData: ProductData;
+  onChange: (variants: Variants[], skuList: SkuList[]) => void;
+}
+
+export interface Variants {
   name: string;
+  images: string[];
   options: { value: string; image: string | null }[];
 }
 
-const ProductVariants: React.FC = () => {
-  const [variantGroups, setVariantGroups] = useState<VariantGroup[]>([
-    { id: 1, name: "", options: [] },
+export interface SkuList {
+  tierIndex: (number | string)[];
+  isDefault: boolean;
+  price: number;
+  quantity: number;
+}
+
+const ProductVariants: React.FC<VariantProps> = ({ formData, onChange }) => {
+  const [variantGroups, setVariantGroups] = useState<Variants[]>([
+    { name: "", images: [], options: [] },
   ]);
+  const [prices, setPrices] = useState<Record<string, number>>({});
+  const [quantities, setQuantities] = useState<Record<string, number>>({});
 
   const availableGroups = ["Màu sắc", "Kích cỡ"];
 
   const addVariantGroup = () => {
     setVariantGroups((prev) => [
       ...prev,
-      { id: prev.length + 1, name: "", options: [] },
+      { name: "", images: [], options: [] },
     ]);
   };
 
   const updateGroupName = (id: number, name: string) => {
     setVariantGroups((prev) =>
-      prev.map((group) => (group.id === id ? { ...group, name } : group))
+      prev.map((group, index) =>
+        index === id ? { ...group, name } : group
+      )
     );
   };
 
   const addOptionToGroup = (groupId: number) => {
     setVariantGroups((prev) =>
-      prev.map((group) =>
-        group.id === groupId
+      prev.map((group, index) =>
+        index === groupId
           ? { ...group, options: [...group.options, { value: "", image: null }] }
           : group
       )
@@ -44,8 +61,8 @@ const ProductVariants: React.FC = () => {
     value: string
   ) => {
     setVariantGroups((prev) =>
-      prev.map((group) =>
-        group.id === groupId
+      prev.map((group, index) =>
+        index === groupId
           ? {
               ...group,
               options: group.options.map((opt, idx) =>
@@ -63,8 +80,8 @@ const ProductVariants: React.FC = () => {
     image: string
   ) => {
     setVariantGroups((prev) =>
-      prev.map((group) =>
-        group.id === groupId
+      prev.map((group, index) =>
+        index === groupId
           ? {
               ...group,
               options: group.options.map((opt, idx) =>
@@ -78,8 +95,8 @@ const ProductVariants: React.FC = () => {
 
   const removeOption = (groupId: number, optionIndex: number) => {
     setVariantGroups((prev) =>
-      prev.map((group) =>
-        group.id === groupId
+      prev.map((group, index) =>
+        index === groupId
           ? {
               ...group,
               options: group.options.filter((_, idx) => idx !== optionIndex),
@@ -90,7 +107,7 @@ const ProductVariants: React.FC = () => {
   };
 
   const removeVariantGroup = (id: number) => {
-    setVariantGroups((prev) => prev.filter((group) => group.id !== id));
+    setVariantGroups((prev) => prev.filter((_, index) => index !== id));
   };
 
   const generateGroupedCombinations = useCallback(() => {
@@ -142,17 +159,39 @@ const ProductVariants: React.FC = () => {
     }));
   }, [generateGroupedCombinations]);
 
+  const notifyParent = () => {
+    // Generate variants and SKU list data
+    const variants = variantGroups.map((group) => ({
+      name: group.name,
+      images: group.images,
+      options: group.options,
+    }));
+
+    const skuList = groupedCombinations.map((combination) => ({
+      tierIndex: [
+        combination.color,
+        ...combination.sizes.map((size) => size?.value),
+      ],
+      isDefault: false,
+      price: prices[combination.color] || 0,
+      quantity: quantities[combination.color] || 0,
+    }));
+
+    // Pass the generated data back to the parent component via `onChange`
+    onChange(variants, skuList);
+  };
+
   return (
     <div>
-      {variantGroups.map((group) => (
+      {variantGroups.map((group, groupId) => (
         <div
-          key={group.id}
+          key={groupId}
           className="p-4 mb-4 border border-gray-300 rounded-md bg-gray-50"
         >
           <div className="flex items-center justify-between mb-4">
             <select
               value={group.name}
-              onChange={(e) => updateGroupName(group.id, e.target.value)}
+              onChange={(e) => updateGroupName(groupId, e.target.value)}
               className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
             >
               <option value="" disabled>
@@ -162,10 +201,7 @@ const ProductVariants: React.FC = () => {
                 <option
                   key={name}
                   value={name}
-                  disabled={
-                    !!variantGroups.find((v) => v.name === name) &&
-                    name !== group.name
-                  }
+                  disabled={!!variantGroups.find((v) => v.name === name)}
                 >
                   {name}
                 </option>
@@ -173,28 +209,28 @@ const ProductVariants: React.FC = () => {
             </select>
             <button
               type="button"
-              onClick={() => removeVariantGroup(group.id)}
+              onClick={() => removeVariantGroup(groupId)}
               className="ml-4 text-red-500 hover:text-red-700"
             >
               X
             </button>
           </div>
 
-          {group.options.map((option, index) => (
-            <div key={index} className="mb-2">
+          {group.options.map((option, optionIndex) => (
+            <div key={optionIndex} className="mb-2">
               <div className="flex items-center">
                 <input
                   type="text"
                   value={option.value}
                   onChange={(e) =>
-                    updateOption(group.id, index, e.target.value)
+                    updateOption(groupId, optionIndex, e.target.value)
                   }
                   placeholder="Nhập tùy chọn"
                   className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                 />
                 <button
                   type="button"
-                  onClick={() => removeOption(group.id, index)}
+                  onClick={() => removeOption(groupId, optionIndex)}
                   className="ml-2 text-red-500 hover:text-red-700"
                 >
                   X
@@ -210,8 +246,8 @@ const ProductVariants: React.FC = () => {
                         const reader = new FileReader();
                         reader.onload = (event) => {
                           updateOptionImage(
-                            group.id,
-                            index,
+                            groupId,
+                            optionIndex,
                             event.target?.result as string
                           );
                         };
@@ -235,86 +271,32 @@ const ProductVariants: React.FC = () => {
 
           <button
             type="button"
-            onClick={() => addOptionToGroup(group.id)}
-            className="mt-2 px-4 py-2 text-sm border border-dashed border-gray-300 rounded-md text-gray-500 hover:border-gray-400"
+            onClick={() => addOptionToGroup(groupId)}
+            className="mt-2 px-4 py-2 bg-blue-500 text-white rounded-md"
           >
-            + Thêm tùy chọn
+            Thêm tùy chọn
           </button>
         </div>
       ))}
+      <div className="mb-4">
+        <button
+          type="button"
+          onClick={addVariantGroup}
+          className="px-4 py-2 bg-green-500 text-white rounded-md"
+        >
+          Thêm nhóm phân loại
+        </button>
+      </div>
 
-      <button
-        type="button"
-        onClick={addVariantGroup}
-        className="px-4 py-2 text-sm border border-dashed border-gray-300 rounded-md text-gray-500 hover:border-gray-400"
-        disabled={variantGroups.length >= availableGroups.length}
-      >
-        + Thêm nhóm phân loại
-      </button>
-
-      {groupedCombinations.length > 0 && (
-        <div className="mt-6">
-          <h3 className="text-lg font-semibold mb-2">Danh sách phân loại hàng</h3>
-          <table className="min-w-full border border-gray-300 text-sm">
-            <thead>
-              <tr className="bg-gray-100">
-                <th className="px-4 py-2 border">Màu sắc</th>
-                <th className="px-4 py-2 border">Hình ảnh</th>
-                <th className="px-4 py-2 border">Kích cỡ</th>
-                <th className="px-4 py-2 border">Giá</th>
-                <th className="px-4 py-2 border">Kho hàng</th>
-              </tr>
-            </thead>
-            <tbody>
-              {groupedCombinations.map((group, groupIdx) => (
-                <React.Fragment key={groupIdx}>
-                  {group.sizes.map((size, sizeIdx) => (
-                    <tr key={sizeIdx}>
-                      {sizeIdx === 0 && (
-                        <>
-                          <td
-                            className="px-4 py-2 border"
-                            rowSpan={group.sizes.length}
-                          >
-                            {group.color}
-                          </td>
-                          <td
-                            className="px-4 py-2 border"
-                            rowSpan={group.sizes.length}
-                          >
-                            {group.image && (
-                              <img
-                                src={group.image}
-                                alt="Uploaded"
-                                className="h-10 w-10 object-cover"
-                              />
-                            )}
-                          </td>
-                        </>
-                      )}
-                      <td className="px-4 py-2 border">{size?.value}</td>
-                      <td className="px-4 py-2 border">
-                        <input
-                          type="text"
-                          placeholder="Nhập giá"
-                          className="w-full px-2 py-1 border rounded"
-                        />
-                      </td>
-                      <td className="px-4 py-2 border">
-                        <input
-                          type="text"
-                          placeholder="Nhập kho hàng"
-                          className="w-full px-2 py-1 border rounded"
-                        />
-                      </td>
-                    </tr>
-                  ))}
-                </React.Fragment>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      )}
+      <div className="mb-4">
+        <button
+          type="button"
+          onClick={notifyParent}
+          className="px-4 py-2 bg-blue-500 text-white rounded-md"
+        >
+          Lưu sản phẩm
+        </button>
+      </div>
     </div>
   );
 };

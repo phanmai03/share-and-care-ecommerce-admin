@@ -54,9 +54,14 @@ export const getChildCategories = async (data: string): Promise<Array<Category.C
     }
 }
 
-export const deleteCategories = async (data: string) => {
+export const deleteCategories = async (data: string,  clientId: string, accessToken: string) => {
     try {
-        const response = await api.delete(`${CATEGORY_URL}/?categoryId=${data}`);
+        const response = await api.delete(`${CATEGORY_URL}/?categoryId=${data}`,{
+            headers: {
+                'x-client-id': clientId,
+                'Authorization': accessToken
+            }
+        });
         return response.data.metadata;
     } catch (error) {
         const errorMessage = get(error, 'response.data.error.message', '');
@@ -68,9 +73,14 @@ export const deleteCategories = async (data: string) => {
     }
 };
 
-export const updateCategories = async (data: Category.CategoryData): Promise<Array<Category.CategoriesDataResponse>> => {
+export const updateCategories = async (data: Category.CategoiesData, clientId: string, accessToken: string): Promise<Category.CategoriesDataResponse> => {
     try {
-        const response = await api.patch(`${CATEGORY_URL}` , data);
+        const response = await api.patch(`${CATEGORY_URL}` , data, {
+            headers: {
+                'x-client-id': clientId,
+                'Authorization': accessToken
+            }
+        });
         return response.data.metadata;
     } catch (error) {
         const errorMessage = get(error, 'response.data.error.message', '');
@@ -81,5 +91,3 @@ export const updateCategories = async (data: Category.CategoryData): Promise<Arr
         throw new Error(errorMessage || 'An unknown error occurred.');
     }
 };
-
-

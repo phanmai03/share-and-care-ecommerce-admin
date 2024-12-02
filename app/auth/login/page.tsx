@@ -139,7 +139,7 @@ const LoginForm = () => {
 
                         {/* Links */}
                         <div className="text-right mt-4">
-                            <Link href="/forgot-password" className="text-[#2F8F8A] hover:underline text-sm">
+                            <Link href="/auth/forgot-password" className="text-[#2F8F8A] hover:underline text-sm">
                                 Forgot Password?
                             </Link>
                         </div>
@@ -182,7 +182,7 @@ const LoginForm = () => {
 
                         <div className="flex justify-center items-center space-x-4 px-10">
                             <hr className="w-full h-0.5 bg-gray-900" />
-                            <h4>Or</h4>
+                            <h4>OR</h4>
                             <hr className="w-full h-0.5 bg-gray-900" />
                         </div>
 

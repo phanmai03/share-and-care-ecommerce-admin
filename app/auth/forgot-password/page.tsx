@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { FaEnvelope, FaSpinner } from "react-icons/fa";
-import { ToastContainer, toast } from "react-toastify";
+import { toast } from "react-toastify";
 import { forgotPassword } from '@/app/api/auth';
 
 export default function Page() {
@@ -36,14 +36,13 @@ export default function Page() {
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-blue-100 via-white to-blue-50">
-      <ToastContainer newestOnTop />
       <div className="bg-white p-8 rounded-2xl shadow-lg max-w-md w-full">
         <div className="text-center mb-6">
           <Image
-            src="/share-and-care-logo.svg"
+            src="/logo.svg"
             alt="Share and Care Logo"
-            width={50}
-            height={50}
+            width={100}
+            height={100}
             className="mx-auto"
           />
           <h2 className="text-2xl font-semibold text-gray-800 mt-4">Forgot Password?</h2>
@@ -80,8 +79,8 @@ export default function Page() {
         </button>
 
         {/* Back to Login */}
-        <div className="text-center mt-4">
-          <Link href="/login" className="text-[#38A59F] hover:underline text-sm">
+        <div className="text-center mt-4">  
+          <Link href="/auth/login" className="text-[#38A59F] hover:underline text-sm">
             Back to Login
           </Link>
         </div>

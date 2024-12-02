@@ -1,5 +1,5 @@
 import { Checkbox } from '@headlessui/react';
-import { CheckIcon } from '@heroicons/react/24/outline';
+import { Check } from 'lucide-react';
 import React from 'react';
 
 interface SelectedAllComboboxProps {
@@ -22,7 +22,7 @@ const SelectedAllCombobox: React.FC<SelectedAllComboboxProps> = ({
         className="relative flex items-center justify-center h-6 w-6 rounded border border-gray-700 bg-white checked:bg-gray-200"
       >
         {selectedAll && (
-          <CheckIcon className="absolute w-4 h-4 text-gray-700" />
+          <Check className="absolute w-4 h-4 text-gray-700" />
         )}
       </Checkbox>
       <h4 className="mt-1 select-none">Select All</h4>

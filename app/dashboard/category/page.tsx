@@ -1,17 +1,19 @@
-"use client";
-
+"use client"
 import { Fragment, useEffect, useState } from "react";
 import { FaEdit, FaTrash } from "react-icons/fa";
 import { CategoryDataResponse } from "@/interface/category";
-import { getAllCategories, getChildCategories } from "@/app/api/category";
+import { deleteCategories, getAllCategories, getChildCategories } from "@/app/api/category";
 import { GoChevronDown, GoChevronUp } from "react-icons/go";
 import { toast } from "react-toastify";
-import CategoryForm from "@/app/ui/category/category-form"
+import CategoryForm from "@/app/ui/category/category-form";
 
 export default function Page() {
   const [categories, setCategories] = useState<Array<CategoryDataResponse>>([]);
-  const [expandedCategory, setExpandedCategory] = useState<string | null>(null); // ID của category đang mở
-  const [childCategories, setChildCategories] = useState<Record<string, Array<CategoryDataResponse>>>({}); // Lưu các danh mục con
+  const [expandedCategory, setExpandedCategory] = useState<string | null>(null);
+  const [childCategories, setChildCategories] = useState<Record<string, Array<CategoryDataResponse>>>({});
+  const [editingCategory, setEditingCategory] = useState<CategoryDataResponse | null>(null);  // Add state for editing category
+  const accessToken = sessionStorage.getItem('accessToken');
+  const clientId = process.env.NEXT_PUBLIC_ADMIN_ID;
 
   useEffect(() => {
     const fetchCategories = async () => {
@@ -28,13 +30,10 @@ export default function Page() {
 
   const handleToggleExpand = async (categoryId: string) => {
     if (expandedCategory === categoryId) {
-      // Đóng nếu đã mở
       setExpandedCategory(null);
     } else {
-      // Mở danh mục mới
       setExpandedCategory(categoryId);
 
-      // Chỉ tải danh mục con nếu chưa tải trước đó
       if (!childCategories[categoryId]) {
         try {
           const response = await getChildCategories(categoryId);
@@ -50,14 +49,32 @@ export default function Page() {
   };
 
   const handleEdit = (category: CategoryDataResponse) => {
-    console.log("Edit category:", category);
-    // Add logic for editing
+    setEditingCategory(category);  // Set the category to be edited
   };
 
-  const handleDelete = async (id: string) => {
+  const handleDelete = async (categoryId: string) => {
+    if (!accessToken) {
+      toast.error("Access token is missing.");
+      return;
+    }
+
+    if (!clientId) {
+      toast.error("Client ID is missing.");
+      return;
+    }
+
     try {
-      console.log("Delete category with ID:", id);
-      // Add API delete logic here
+      const response = await deleteCategories(categoryId, clientId, accessToken);
+      console.log(response);
+
+      if (response && response.success) {
+        const updatedCategories = await getAllCategories();
+        setCategories(updatedCategories);
+
+        toast.success("Category deleted successfully");
+      } else {
+        toast.error("Failed to delete category.");
+      }
     } catch (error) {
       toast.error(`Error deleting category: ${error}`);
     }
@@ -73,13 +90,12 @@ export default function Page() {
               <th className="w-1/6 py-2 px-4 border-b">ID</th>
               <th className="w-1/2 py-2 px-4 border-b">Name</th>
               <th className="w-1/4 py-2 px-4 border-b">Action</th>
-              <th className="w-1/12 py-2 px-4 border-b text-center">Expand</th>
+              <th className="w-1/12 py-2 px-4 border-b text-center"></th>
             </tr>
           </thead>
           <tbody>
             {categories.map((category) => (
               <Fragment key={category.id}>
-                {/* Row for parent category */}
                 <tr>
                   <td className="py-2 px-4 border-b">{category.id}</td>
                   <td className="py-2 px-4 border-b">{category.name}</td>
@@ -100,7 +116,7 @@ export default function Page() {
                   <td className="py-2 px-4 border-b text-center">
                     <button
                       onClick={() => handleToggleExpand(category.id)}
-                      className="text-blue-500 hover:underline"
+                      className="text-black text-cen hover:underline"
                     >
                       {expandedCategory === category.id ? (
                         <GoChevronUp />
@@ -111,10 +127,9 @@ export default function Page() {
                   </td>
                 </tr>
 
-                {/* Rows for child categories */}
                 {expandedCategory === category.id &&
                   childCategories[category.id]?.map((child) => (
-                    <tr key={child.id} className="bg-gray-50">
+                    <tr key={child.id} className="bg-slate-400">
                       <td className="py-2 px-4 border-b pl-8">{child.id}</td>
                       <td className="py-2 px-4 border-b">{child.name}</td>
                       <td className="py-2 px-4 border-b">
@@ -140,8 +155,8 @@ export default function Page() {
         </table>
       </div>
 
-      <div>
-        <CategoryForm />
+      <div className="bg-white rounded-lg shadow-md p-6 w-full max-w-md mx-auto">
+        <CategoryForm category={editingCategory} />
       </div>
     </div>
   );

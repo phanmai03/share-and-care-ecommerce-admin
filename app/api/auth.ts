@@ -80,6 +80,30 @@ export const forgotPassword = async (data: Auth.ForgotPasswordData) => {
     }
 };
 
+
+// export const forgotPassword = async (data: Auth.ForgotPasswordData, isPanel: boolean) => {
+//     try {
+//         // Add `isPanel` to the data object before sending the request
+//         const requestData = { ...data, isPanel };
+        
+//         console.log('Request Data:', requestData);  // Log the request data
+
+//         const response = await api.post(`${AUTH_URL}/forgot-password`, requestData);
+
+//         console.log('API Response:', response.data);  // Log the response data
+
+//         return response.data.metadata;
+//     } catch (error) {
+//         const errorMessage = get(error, 'response.data.error.message', '');
+//         if (errorMessage) {
+//             toast.error(errorMessage);
+//         }
+//         throw new Error(errorMessage || 'An unknown error occurred.');
+//     }
+// };
+
+
+
 export const resetPassword = async (data: Auth.ResetPasswordData) => {
     try {
         const response = await api.post(`${AUTH_URL}/reset-password`, data);

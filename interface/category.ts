@@ -3,6 +3,11 @@ export interface CategoryData {
     parentId: null | string,
 }
 
+export interface CategoiesData {
+    categoryId: string,
+    name: string,
+}
+
 export interface CategoriesDataResponse{
     id: string,
     name: string,
@@ -14,3 +19,4 @@ export interface CategoryDataResponse {
     parentId: null,
     children: Array<null>,
 }
+

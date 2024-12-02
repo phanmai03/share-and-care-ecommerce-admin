@@ -31,13 +31,13 @@ const Sidebar: React.FC<SidebarProps> = ({ showSidebar, setShowSidebar }) => {
     { title: "Category", icon: LayoutGrid, href: "/dashboard/category" },
     { title: "Add Product", icon: HousePlus, href: "/dashboard/add-product" },
     { title: "All Product", icon: ShoppingBasket, href: "/dashboard/all-product" },
-    { title: "Email", icon: Mail, href: "/dashboard/email" },
-    { title: "Discount", icon: TicketPercent, href: "/dashboard/discount" },
-    { title: "Feedback", icon: MessagesSquare, href: "/dashboard/feedback" },
-    { title: "Blog", icon: ListTodo, href: "/dashboard/blog" },
-    { title: "Seller", icon: UserSquare2, href: "/dashboard/seller" },
-    { title: "Customer", icon: Users2, href: "/dashboard/customer" },
-    { title: "Return Policy", icon: Settings, href: "/dashboard/return-policy" },
+    // { title: "Email", icon: Mail, href: "/dashboard/email" },
+    // { title: "Discount", icon: TicketPercent, href: "/dashboard/discount" },
+    // { title: "Feedback", icon: MessagesSquare, href: "/dashboard/feedback" },
+    // { title: "Blog", icon: ListTodo, href: "/dashboard/blog" },
+    // { title: "Seller", icon: UserSquare2, href: "/dashboard/seller" },
+    // { title: "Customer", icon: Users2, href: "/dashboard/customer" },
+    // { title: "Return Policy", icon: Settings, href: "/dashboard/return-policy" },
   ];
 
 

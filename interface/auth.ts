@@ -33,7 +33,7 @@ export interface LoginDataResponse {
 }
 
 export interface ForgotPasswordData {
-    email: string;
+    email: string;  
 }
 
 export interface ResetPasswordData {
