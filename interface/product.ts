@@ -11,47 +11,21 @@
     variants:Array<Variants>,
     skuList: Array<SkuList>,
   }
-
-  export interface Category {
-    id: string,
-    name: string,
-  }
-  
-  export interface Variants{
-    name: string,
-    images: Array<string>,
-    options: Array<string>,
-  }
-  
-  export interface SkuList {
-    tierIndex: (number | string)[],
-    isDefault: boolean,
-    price: number,
-    quantity: number,
-  }
   
 export interface ProductDataResponse {
     id: string,
     name: string,
-    slug:string,
-    mainImage: string,
-    subImages:Array<string>,
+    slug:string, 
+    mainImage: string, 
     price: number,
     originalPrice: number,
     quantity: number,
     sold: number,
-    description: string,
-    category:Array<Category>,
-    attributes:Array<string>,
     status:string,
     rating: number,
     views: number,
-    uniqueViews: number,
+    uniqueViews: number, 
     variants:Array<Variants>,
-}
-
-export interface ProductDetailResponse {
-  products: ProductDataResponse[],
 }
 
 export interface ProductResponse {
@@ -61,20 +35,76 @@ export interface ProductResponse {
     products: ProductDataResponse[],
 }
 
-export interface ProductDetail {
+export interface Category {
+  id: string;
+  name: string;
+}
+
+export interface Variants {
+  name: string;
+  images: string[];
+  options: string[];
+}
+
+export interface SkuList {
+  id: string;
+  slug: string;
+  tierIndex: (number | string)[];
+  isDefault: boolean;
+  price: number;
+  quantity: number;
+  sold: number;
+  status: string;
+}
+
+export interface ProductDataDetail {
+  id: string;
+  name: string;
+  slug: string;
+  mainImage: string;
+  subImages: string[];
+  price: number;
+  originalPrice: number;
+  quantity: number;
+  sold: number;
+  description: string;
+  category: Category[];
+  attributes: string[];
+  status: string;
+  rating: number;
+  views: number;
+  uniqueViews: number;
+  variants: Variants[];
+  skuList: SkuList[];
+}
+
+export interface ProductDataDetailResponse {
+  product: ProductDataDetail[];
+  skuList: SkuList[];
+}
+
+
+export interface ProductUpdate{
+  id: string,
   name: string,
-  description: string,
-  category: Array<Category>,
-  attributes:Array<string>,
-}
-
-export interface ImageUpload {
-  mainImage: string,
+  slug: string, 
+  mainImage: string, 
   subImages: Array<string>,
-}
-
-export interface Properties {
   price: number,
   originalPrice: number,
   quantity: number,
+  sold: number,
+  description: string,
+  category: Category[]
+  attributes: string [],
+  status:string,
+  rating: number,
+  views: number,
+  uniqueViews: number, 
+  variants:Array<Variants>,
+}
+
+
+export interface ProductUpdateResponse{
+  products: ProductUpdate[],
 }
