@@ -1,3 +1,5 @@
+
+"use client"
 import { useState, useEffect } from "react";
 import { CategoryData, CategoryDataResponse } from "@/interface/category";
 import { toast } from "react-toastify";
@@ -5,17 +7,18 @@ import { createCategories, getAllCategories, updateCategories } from "@/app/api/
 
 interface CategoryFormProps {
   category: CategoryDataResponse | null;
+  onSubmit: () => void;  // Add the onSubmit prop
 }
 
-export default function CategoryForm({ category }: CategoryFormProps) {
+export default function CategoryForm({ category, onSubmit }: CategoryFormProps) {
   const [formData, setFormData] = useState<CategoryData>({
     name: "",
-    parentId: null, // Allow null for no parent category
+    parentId: null,
   });
   const [categories, setCategories] = useState<CategoryDataResponse[]>([]);
   const [loading, setLoading] = useState(false);
-  const accessToken = sessionStorage.getItem("accessToken");
-  const id = process.env.NEXT_PUBLIC_ADMIN_ID;
+  const accessToken = localStorage.getItem('accessToken');
+  const userId = localStorage.getItem('userId');
 
   useEffect(() => {
     const fetchCategories = async () => {
@@ -43,43 +46,35 @@ export default function CategoryForm({ category }: CategoryFormProps) {
     }
   }, [category]);
 
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
-  ) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
       ...prev,
-      [name]: value === "" ? null : value, // Convert "" to null for parentId
+      [name]: value === "" ? null : value,
     }));
   };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setLoading(true);
-  
+
     try {
-      if (id && accessToken) {
+      if (userId && accessToken) {
         const payload = {
           name: formData.name,
-          parentId: formData.parentId || null, // Ensure parentId is either a string or null
+          parentId: formData.parentId || null,
         };
-  
+
         if (category) {
-          // Include categoryId explicitly in the payload for updates
-          await updateCategories(
-            { ...payload, categoryId: category.id }, // Use category.id, not formData.categoryId
-            id,
-            accessToken
-          );
+          await updateCategories({ ...payload, categoryId: category.id }, userId, accessToken);
           toast.success("Category updated successfully.");
         } else {
-          // Create category
-          await createCategories(payload, id, accessToken);
+          await createCategories(payload, userId, accessToken);
           toast.success("Category added successfully.");
         }
-  
-        // Reset form after success
+
         setFormData({ name: "", parentId: null });
+        onSubmit(); // Trigger re-fetch
       } else {
         toast.error("Missing ID or access token.");
       }
@@ -90,7 +85,6 @@ export default function CategoryForm({ category }: CategoryFormProps) {
       setLoading(false);
     }
   };
-  
 
   return (
     <div className="bg-white rounded-lg p-6 max-w-lg w-full">
@@ -120,7 +114,7 @@ export default function CategoryForm({ category }: CategoryFormProps) {
           <select
             id="parentId"
             name="parentId"
-            value={formData.parentId ?? ""} // Display null as empty string
+            value={formData.parentId ?? ""}
             onChange={handleChange}
             className="w-full p-2 mt-1 border rounded-md"
           >

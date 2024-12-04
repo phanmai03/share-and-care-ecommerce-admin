@@ -2,7 +2,6 @@
 
 import React, { useState } from "react";
 import Image from "next/image";
-import Link from "next/link";
 import { FaGoogle, FaFacebook } from "react-icons/fa";
 import { useRouter } from "next/navigation";
 import { Mail, Lock } from "lucide-react";
@@ -16,6 +15,7 @@ const LoginForm = () => {
         password: "",
     });
     const router = useRouter();
+    // const { deviceToken, deviceName, browserName } = useDeviceInfo();
     const { setIsLogin } = useAuth();
     const [loading, setLoading] = useState(false);
     const [accessAdmin, setaccessAdmin] = useState({});
@@ -33,11 +33,14 @@ const LoginForm = () => {
             const response = await loginRequest({
                 email: formData.email,
                 password: formData.password,
+                // deviceToken: deviceToken,
+                // deviceName: deviceName,
             });
 
-            // Save tokens in sessionStorage
-            sessionStorage.setItem("accessToken", response.tokens.accessToken);
-            sessionStorage.setItem("refreshToken", response.tokens.refreshToken);
+            localStorage.setItem("accessToken", response.tokens.accessToken);
+            localStorage.setItem("refreshToken", response.tokens.refreshToken);
+            localStorage.setItem("userId", response.user.id);
+
             setIsLogin(true);
 
             // Check if the user is an admin
@@ -64,6 +67,8 @@ const LoginForm = () => {
             setLoading(false); // Stop loading
         }
     };
+
+    localStorage.setItem("isPanel", "true")
 
     const handleGoogleSignIn = () => {
         alert("Google Sign-In not implemented.");
@@ -135,13 +140,6 @@ const LoginForm = () => {
                                     autoComplete="current-password"
                                 />
                             </div>
-                        </div>
-
-                        {/* Links */}
-                        <div className="text-right mt-4">
-                            <Link href="/auth/forgot-password" className="text-[#2F8F8A] hover:underline text-sm">
-                                Forgot Password?
-                            </Link>
                         </div>
 
                         {/* Login Button */}

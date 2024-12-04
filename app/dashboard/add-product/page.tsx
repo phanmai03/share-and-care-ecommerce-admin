@@ -1,5 +1,4 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-"use client"
+"use client";
 import React, { useState } from "react";
 import Heading from "@/app/ui/heading";
 import Detail from "@/app/ui/add-product/detail-product";
@@ -25,98 +24,90 @@ const Page = () => {
     skuList: [],
   });
 
-  const [isAddingVariants, setIsAddingVariants] = useState<boolean>(false); // State to toggle adding variants
-  const accessToken = sessionStorage.getItem("accessToken");
-  const clientId = process.env.NEXT_PUBLIC_ADMIN_ID;
+  const [isAddingVariants, setIsAddingVariants] = useState<boolean>(false);
+  const accessToken = localStorage.getItem('accessToken');
+  const userId= localStorage.getItem('userId')
 
   const handleChange = (key: string, value: unknown) => {
     setFormData((prev) => ({
       ...prev,
       [key]: value,
     }));
-  };
+  }
 
-  const handlePropertyChange = React.useCallback(
-    (price: number, originalPrice: number, quantity: number) => {
-      setFormData((prevData) => ({
-        ...prevData,
-        price,
-        originalPrice,
-        quantity,
-      }));
-    },
-    []
-  );
-  
+    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+      e.preventDefault();
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
+      if (!userId || !accessToken) {
+        toast.error("Missing authentication information. Please log in again.");
+        return;
+      }
+      console.log(formData)
+      
+      try {
 
-    if (!clientId || !accessToken) {
-      toast.error("Missing authentication information. Please log in again.");
-      return;
-    }
-    try {
-      const response: ProductDetailResponse = await createProduct(
-        { ...formData },
-        clientId,
-        accessToken
-      );
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        const response: ProductDetailResponse = await createProduct(
+          { ...formData },
+          userId,
+          accessToken
+        );
 
-      toast.success("Product added successfully!");
-    } catch (error) {
-      toast.error(`Error creating product: ${error}`);
-    }
-  };
+        toast.success("Product added successfully!");
+      } catch (error) {
+        toast.error(`Error creating product: ${error}`);
+      }
+    };
 
-  // Toggle to switch between adding properties or variants
-  const handleToggleVariants = () => {
-    setIsAddingVariants(!isAddingVariants);
-  };
+    const handleToggleVariants = () => {
+      setIsAddingVariants(!isAddingVariants);
+    };
 
-  return (
-    <div className="min-h-screen p-6">
-      <Heading title="Add Product" />
-      <div className="flex justify-center items-center mt-6">
-        <div className="bg-white max-w-4xl w-full p-6 rounded-lg shadow-lg">
-          <form onSubmit={handleSubmit} className="space-y-6">
-            {/* Product Details */}
-            <Detail formData={formData} onChange={handleChange} />
-            {/* Product Images */}
-            <Images formData={formData} onChange={handleChange} />
+    console.log(formData)
 
-            {/* Conditionally Render Properties or Variants */}
-            {isAddingVariants ? (
-              <ProductVariants formData={formData} onChange={handleChange} />
-            ) : (
-              <Property formData={formData} onChange={handlePropertyChange} />
-            )}
+    return (
+      <div className="min-h-screen p-6">
+        <Heading title="Add Product" />
+        <div className="flex justify-center items-center mt-6">
+          <div className="bg-white max-w-4xl w-full p-6 rounded-lg shadow-lg">
+            <form onSubmit={handleSubmit} className="space-y-6">
+              {/* Product Details */}
+              <Detail formData={formData} setFormData={setFormData} />
+              {/* Product Images */}
+              <Images formData={formData} setFormData={setFormData} onChange={handleChange} />
 
-            {/* Toggle to show properties or variants */}
-            <div className="flex justify-between items-center mb-6">
-              <button
-                type="button"
-                onClick={handleToggleVariants}
-                className="px-4 py-2 text-sm border border-dashed border-gray-300 rounded-md text-gray-500 hover:border-gray-400"
-              >
-                {isAddingVariants ? "Cancel Adding Variants" : "Add Variants"}
-              </button>
-            </div>
+              {/* Conditionally Render Properties or Variants */}
+              {isAddingVariants ? (
+                <ProductVariants formData={formData} setFormData={setFormData} />
+              ) : (
+                <Property formData={formData} setFormData={setFormData} />
+              )}
 
-            {/* Submit Button */}
-            <div className="flex justify-between items-center mt-6">
-              <button
-                type="submit"
-                className="px-6 py-2 bg-[#38A59F] text-white rounded-lg shadow hover:bg-[#2F8F8A] transition"
-              >
-                Add Product
-              </button>
-            </div>
-          </form>
+              {/* Toggle to show properties or variants */}
+              <div className="flex justify-between items-center mb-6">
+                <button
+                  type="button"
+                  onClick={handleToggleVariants}
+                  className="px-4 py-2 text-sm border border-dashed border-gray-300 rounded-md text-gray-500 hover:border-gray-400"
+                >
+                  {isAddingVariants ? "Cancel Adding Variants" : "Add Variants"}
+                </button>
+              </div>
+
+              {/* Submit Button */}
+              <div className="flex justify-between items-center mt-6">
+                <button
+                  type="submit"
+                  className="px-6 py-2 bg-[#38A59F] text-white rounded-lg shadow hover:bg-[#2F8F8A] transition"
+                >
+                  Add Product
+                </button>
+              </div>
+            </form>
+          </div>
         </div>
       </div>
-    </div>
-  );
-};
+    );
+  };
 
-export default Page;
+  export default Page;

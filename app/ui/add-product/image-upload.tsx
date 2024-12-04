@@ -5,10 +5,11 @@ import Image from "next/image"; // Import next/image
 
 interface ImageUploadProps {
   formData: ProductData;
+  setFormData: React.Dispatch<React.SetStateAction<ProductData>>;
   onChange: (mainImage: string, subImages: Array<string>) => void;
 }
 
-const ImageUpload: React.FC<ImageUploadProps> = ({ formData, onChange }) => {
+const ImageUpload: React.FC<ImageUploadProps> = ({ formData, setFormData, onChange }) => {
   const [mainImage, setMainImage] = useState<File | null>(null);
   const [subImages, setSubImages] = useState<File[]>([]);
 
@@ -56,27 +57,33 @@ const ImageUpload: React.FC<ImageUploadProps> = ({ formData, onChange }) => {
       newMainImage ? URL.createObjectURL(newMainImage) : "",
       newSubImages.map((file) => URL.createObjectURL(file))
     );
+
+    setFormData((prevData) => ({
+      ...prevData,
+      mainImage: newMainImage ? URL.createObjectURL(newMainImage) : "",
+      subImages: newSubImages.map((file) => URL.createObjectURL(file)),
+    }));
   };
 
-  const handleUpload = () => {
-    if (!mainImage) {
-      toast.error("Please select a main image to upload.");
-      return;
-    }
+  // const handleUpload = () => {
+  //   if (!mainImage) {
+  //     toast.error("Please select a main image to upload.");
+  //     return;
+  //   }
 
-    try {
-      const mainImageUrl = URL.createObjectURL(mainImage);
-      const subImageUrls = subImages.map((file) => URL.createObjectURL(file));
+  //   try {
+  //     const mainImageUrl = URL.createObjectURL(mainImage);
+  //     const subImageUrls = subImages.map((file) => URL.createObjectURL(file));
 
-      // After "upload", call the onChange to propagate the new image URLs back to the parent component
-      onChange(mainImageUrl, subImageUrls);
+  //     // After "upload", call the onChange to propagate the new image URLs back to the parent component
+  //     onChange(mainImageUrl, subImageUrls);
 
-      toast.success("Product images processed successfully!");
-    } catch (error) {
-      console.error("Error processing images:", error);
-      toast.error("Failed to process images.");
-    }
-  };
+  //     toast.success("Product images processed successfully!");
+  //   } catch (error) {
+  //     console.error("Error processing images:", error);
+  //     toast.error("Failed to process images.");
+  //   }
+  // };
 
   return (
     <div className="max-w-4xl mx-auto p-6">
@@ -135,12 +142,12 @@ const ImageUpload: React.FC<ImageUploadProps> = ({ formData, onChange }) => {
         </div>
       )}
 
-      <button
+      {/* <button
         onClick={handleUpload}
         className="mt-6 px-6 py-2 rounded-lg text-white shadow bg-[#38A59F] hover:bg-[#2F8F8A] transition"
       >
         Process Images
-      </button>
+      </button> */}
     </div>
   );
 };

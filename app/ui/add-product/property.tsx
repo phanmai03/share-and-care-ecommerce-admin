@@ -3,10 +3,10 @@ import React, { useState, useEffect } from "react";
 
 interface PropertyProps {
   formData: ProductData;
-  onChange: (price: number, originalPrice: number, quantity: number) => void;
+  setFormData: React.Dispatch<React.SetStateAction<ProductData>>;
 }
 
-const PropertyForm: React.FC<PropertyProps> = ({ formData, onChange }) => {
+const PropertyForm: React.FC<PropertyProps> = ({ formData, setFormData }) => {
   const [price, setPrice] = useState<number>(formData.price || 0);
   const [originalPrice, setOriginalPrice] = useState<number>(formData.originalPrice || 0);
   const [quantity, setQuantity] = useState<number>(formData.quantity || 0);
@@ -27,8 +27,13 @@ const PropertyForm: React.FC<PropertyProps> = ({ formData, onChange }) => {
   };
 
   useEffect(() => {
-    onChange(price, originalPrice, quantity);
-  }, [price, originalPrice, quantity, onChange]);
+    setFormData((prevData) => ({
+      ...prevData,
+      price,
+      originalPrice,
+      quantity,
+    }));
+  }, [price, originalPrice, quantity, setFormData]);
 
   return (
     <div className="p-6 bg-white shadow-md rounded-md">

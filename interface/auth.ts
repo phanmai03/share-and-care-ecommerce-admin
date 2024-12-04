@@ -17,6 +17,8 @@ export interface ResendDataResponse {
 export interface LoginData {
     email: string;
     password: string;
+    // deviceToken: string,
+    // deviceName: string,
 }
 
 export interface LoginDataResponse {
@@ -34,9 +36,19 @@ export interface LoginDataResponse {
 
 export interface ForgotPasswordData {
     email: string;  
+    // isPanel: boolean;
 }
 
 export interface ResetPasswordData {
     resetToken: string | undefined;
     newPassword: string;
 }
+
+export interface UploadAvatar{
+    file: File;  
+}
+
+export interface UploadAvatarResponse{
+    image_url: string;  
+}
+

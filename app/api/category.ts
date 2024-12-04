@@ -6,11 +6,11 @@ import get from 'lodash/get';
 
 const CATEGORY_URL = '/categories';
 
-export const createCategories = async (data: Category.CategoryData, clientId: string, accessToken: string): Promise<Category.CategoriesDataResponse> => {
+export const createCategories = async (data: Category.CategoryData, userId: string, accessToken: string): Promise<Category.CategoriesDataResponse> => {
     try {
         const response = await api.post(`${CATEGORY_URL}`, data, {
             headers: {
-                'x-client-id': clientId,
+                'x-client-id': userId,
                 'Authorization': accessToken
             }
         });
@@ -54,11 +54,11 @@ export const getChildCategories = async (data: string): Promise<Array<Category.C
     }
 }
 
-export const deleteCategories = async (data: string,  clientId: string, accessToken: string) => {
+export const deleteCategories = async (data: string, userId: string, accessToken: string) => {
     try {
         const response = await api.delete(`${CATEGORY_URL}/?categoryId=${data}`,{
             headers: {
-                'x-client-id': clientId,
+                'x-client-id': userId,
                 'Authorization': accessToken
             }
         });
@@ -73,11 +73,11 @@ export const deleteCategories = async (data: string,  clientId: string, accessTo
     }
 };
 
-export const updateCategories = async (data: Category.CategoiesData, clientId: string, accessToken: string): Promise<Category.CategoriesDataResponse> => {
+export const updateCategories = async (data: Category.CategoiesData, userId: string, accessToken: string): Promise<Category.CategoriesDataResponse> => {
     try {
         const response = await api.patch(`${CATEGORY_URL}` , data, {
             headers: {
-                'x-client-id': clientId,
+                'x-client-id': userId,
                 'Authorization': accessToken
             }
         });

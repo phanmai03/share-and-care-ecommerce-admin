@@ -3,13 +3,18 @@
 import { ProductData } from "@/interface/product";
 import React, { useState, useCallback, useMemo } from "react";
 
-interface VariantProps{
- formData: ProductData;
- onChange: (name: string, images: Array<string>, options: Array<string>,
-  tierIndex: (number | string)[], isDefault: boolean, price: number, quantity: number ) => void
+interface VariantProps {
+  formData: ProductData;
+  setFormData: React.Dispatch<React.SetStateAction<ProductData>>;
 }
 
-const ProductVariants: React.FC = () => {
+interface VariantGroup {
+  id: number;
+  name: string;
+  options: Array<{ value: string; image: string | null }>;
+}
+
+const ProductVariants: React.FC<VariantProps> = ({ formData, setFormData }) => {
   const [variantGroups, setVariantGroups] = useState<VariantGroup[]>([
     { id: 1, name: "", options: [] },
   ]);
@@ -48,11 +53,11 @@ const ProductVariants: React.FC = () => {
       prev.map((group) =>
         group.id === groupId
           ? {
-              ...group,
-              options: group.options.map((opt, idx) =>
-                idx === optionIndex ? { ...opt, value } : opt
-              ),
-            }
+            ...group,
+            options: group.options.map((opt, idx) =>
+              idx === optionIndex ? { ...opt, value } : opt
+            ),
+          }
           : group
       )
     );
@@ -67,11 +72,11 @@ const ProductVariants: React.FC = () => {
       prev.map((group) =>
         group.id === groupId
           ? {
-              ...group,
-              options: group.options.map((opt, idx) =>
-                idx === optionIndex ? { ...opt, image } : opt
-              ),
-            }
+            ...group,
+            options: group.options.map((opt, idx) =>
+              idx === optionIndex ? { ...opt, image } : opt
+            ),
+          }
           : group
       )
     );
@@ -82,9 +87,9 @@ const ProductVariants: React.FC = () => {
       prev.map((group) =>
         group.id === groupId
           ? {
-              ...group,
-              options: group.options.filter((_, idx) => idx !== optionIndex),
-            }
+            ...group,
+            options: group.options.filter((_, idx) => idx !== optionIndex),
+          }
           : group
       )
     );
@@ -117,9 +122,9 @@ const ProductVariants: React.FC = () => {
     return primaryGroup.flatMap((primaryOption) =>
       secondaryGroup.length > 0
         ? secondaryGroup.map((secondaryOption) => ({
-            primaryOption,
-            secondaryOption,
-          }))
+          primaryOption,
+          secondaryOption,
+        }))
         : [{ primaryOption, secondaryOption: null }]
     );
   }, [variantGroups]);
@@ -143,6 +148,22 @@ const ProductVariants: React.FC = () => {
     }));
   }, [generateGroupedCombinations]);
 
+  // Update formData with current variants
+  React.useEffect(() => {
+    const variants = groupedCombinations.map((group) => ({
+      color: group.color,
+      image: group.image,
+      sizes: group.sizes,
+    }));
+
+    setFormData((prevData) => ({
+      ...prevData,
+      variants,
+    }));
+  }, [groupedCombinations, setFormData]);
+
+  console.log(formData)
+  
   return (
     <div>
       {variantGroups.map((group) => (
@@ -321,3 +342,4 @@ const ProductVariants: React.FC = () => {
 };
 
 export default ProductVariants;
+

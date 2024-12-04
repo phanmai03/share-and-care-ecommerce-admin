@@ -1,3 +1,4 @@
+
 "use client"
 import { Fragment, useEffect, useState } from "react";
 import { FaEdit, FaTrash } from "react-icons/fa";
@@ -11,20 +12,23 @@ export default function Page() {
   const [categories, setCategories] = useState<Array<CategoryDataResponse>>([]);
   const [expandedCategory, setExpandedCategory] = useState<string | null>(null);
   const [childCategories, setChildCategories] = useState<Record<string, Array<CategoryDataResponse>>>({});
-  const [editingCategory, setEditingCategory] = useState<CategoryDataResponse | null>(null);  // Add state for editing category
-  const accessToken = sessionStorage.getItem('accessToken');
-  const clientId = process.env.NEXT_PUBLIC_ADMIN_ID;
+  const [editingCategory, setEditingCategory] = useState<CategoryDataResponse | null>(null);  
+
+  const accessToken = localStorage.getItem('accessToken');
+  const userId = localStorage.getItem('userId');
+
+  // Re-fetch categories after any modification
+  const fetchCategories = async () => {
+    try {
+      const response = await getAllCategories();
+      setCategories(response);
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    } catch (error) {
+      toast.error("Error fetching categories.");
+    }
+  };
 
   useEffect(() => {
-    const fetchCategories = async () => {
-      try {
-        const response = await getAllCategories();
-        setCategories(response);
-      } catch (error) {
-        toast.error(`Error fetching categories: ${error}`);
-      }
-    };
-
     fetchCategories();
   }, []);
 
@@ -41,42 +45,33 @@ export default function Page() {
             ...prev,
             [categoryId]: response,
           }));
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         } catch (error) {
-          toast.error(`Error fetching child categories: ${error}`);
+          toast.error("Error fetching child categories.");
         }
       }
     }
   };
 
   const handleEdit = (category: CategoryDataResponse) => {
-    setEditingCategory(category);  // Set the category to be edited
+    setEditingCategory(category); 
   };
 
   const handleDelete = async (categoryId: string) => {
-    if (!accessToken) {
-      toast.error("Access token is missing.");
-      return;
-    }
-
-    if (!clientId) {
-      toast.error("Client ID is missing.");
+    if (!accessToken || !userId) {
+      toast.error("Missing required data.");
       return;
     }
 
     try {
-      const response = await deleteCategories(categoryId, clientId, accessToken);
-      console.log(response);
-
-      if (response && response.success) {
-        const updatedCategories = await getAllCategories();
-        setCategories(updatedCategories);
-
-        toast.success("Category deleted successfully");
-      } else {
-        toast.error("Failed to delete category.");
-      }
+      await deleteCategories(categoryId, userId, accessToken);
+      setCategories((prevCategories) =>
+        prevCategories.filter((category) => category.id !== categoryId)
+      );
+      toast.success("Category deleted successfully");
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
-      toast.error(`Error deleting category: ${error}`);
+      toast.error("Error deleting category.");
     }
   };
 
@@ -156,7 +151,7 @@ export default function Page() {
       </div>
 
       <div className="bg-white rounded-lg shadow-md p-6 w-full max-w-md mx-auto">
-        <CategoryForm category={editingCategory} />
+        <CategoryForm category={editingCategory} onSubmit={fetchCategories} />
       </div>
     </div>
   );

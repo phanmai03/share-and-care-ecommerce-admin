@@ -28,6 +28,10 @@ export interface ProductDataResponse {
     variants:Array<Variants>,
 }
 
+export interface ProductDetailResponse {
+  products: ProductDataResponse[],
+}
+
 export interface ProductResponse {
     totalPages: number,
     totalProducts: number,
@@ -41,12 +45,20 @@ export interface Category {
 }
 
 export interface Variants {
-  name: string;
-  images: string[];
-  options: string[];
+  name: string; //color or size
+  images: string[]; 
+  options: string[]; //màu or size
 }
 
-export interface SkuList {
+export interface SkuList{
+  tierIndex: (number | string)[];
+  isDefault: boolean;
+  price: number;
+  quantity: number;
+}
+
+
+export interface SkuListData {
   id: string;
   slug: string;
   tierIndex: (number | string)[];
@@ -75,12 +87,14 @@ export interface ProductDataDetail {
   views: number;
   uniqueViews: number;
   variants: Variants[];
-  skuList: SkuList[];
+  skuList: SkuListData[];
 }
 
 export interface ProductDataDetailResponse {
-  product: ProductDataDetail[];
-  skuList: SkuList[];
+  product: ProductDataDetail;
+  skuList: {
+    skuList: Array<SkuList>,
+}
 }
 
 
@@ -108,3 +122,4 @@ export interface ProductUpdate{
 export interface ProductUpdateResponse{
   products: ProductUpdate[],
 }
+

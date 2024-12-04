@@ -32,11 +32,11 @@ export const loginRequest = async (data: Auth.LoginData): Promise<Auth.LoginData
     }
 };
 
-export const checkAdmin = async (clientId: string, accessToken: string) => {
+export const checkAdmin = async (userId: string, accessToken: string) => {
     try {
         const response = await api.get(`${AUTH_URL}/admin-panel`, {
             headers: {
-                'x-client-id': clientId,
+                'x-client-id': userId,
                 'Authorization': accessToken,
             },
         });
@@ -49,11 +49,11 @@ export const checkAdmin = async (clientId: string, accessToken: string) => {
 };
 
 
-export const logoutRequest = async (clientId: string, accessToken: string) => {
+export const logoutRequest = async (userId: string, accessToken: string) => {
     try {
         const response = await api.post(`${AUTH_URL}/logout`, null, {
             headers: {
-                'x-client-id': clientId,
+                'x-client-id': userId,
                 'Authorization': accessToken
             }
         });
@@ -67,41 +67,22 @@ export const logoutRequest = async (clientId: string, accessToken: string) => {
     }
 };
 
-export const forgotPassword = async (data: Auth.ForgotPasswordData) => {
+export const updatePassword = async (data: Auth.ForgotPasswordData, isPanel: boolean) => {
     try {
-        const response = await api.post(`${AUTH_URL}/forgot-password`, data);
-        return response.data.metadata;
+        // Thêm isPanel vào body của request nếu cần thiết
+        const response = await api.post(`${AUTH_URL}/forgot-password`, {
+            ...data,
+            isPanel,  // Thêm isPanel vào request body nếu cần thiết
+        });
+        return response.data.metadata; // Trả về metadata nếu thành công
     } catch (error) {
         const errorMessage = get(error, 'response.data.error.message', '');
         if (errorMessage) {
-            toast.error(errorMessage);
+            toast.error(errorMessage); // Hiển thị thông báo lỗi nếu có
         }
-        throw new Error(errorMessage || 'An unknown error occurred.');
+        throw new Error(errorMessage || 'An unknown error occurred.'); // Ném lỗi nếu có
     }
 };
-
-
-// export const forgotPassword = async (data: Auth.ForgotPasswordData, isPanel: boolean) => {
-//     try {
-//         // Add `isPanel` to the data object before sending the request
-//         const requestData = { ...data, isPanel };
-        
-//         console.log('Request Data:', requestData);  // Log the request data
-
-//         const response = await api.post(`${AUTH_URL}/forgot-password`, requestData);
-
-//         console.log('API Response:', response.data);  // Log the response data
-
-//         return response.data.metadata;
-//     } catch (error) {
-//         const errorMessage = get(error, 'response.data.error.message', '');
-//         if (errorMessage) {
-//             toast.error(errorMessage);
-//         }
-//         throw new Error(errorMessage || 'An unknown error occurred.');
-//     }
-// };
-
 
 
 export const resetPassword = async (data: Auth.ResetPasswordData) => {
@@ -117,3 +98,29 @@ export const resetPassword = async (data: Auth.ResetPasswordData) => {
     }
 };
 
+export const uploadAvatar = async (
+    data: Auth.UploadAvatar,
+    userId: string,
+    accessToken: string
+  ): Promise<Auth.UploadAvatarResponse> => {
+    try {
+      const formData = new FormData();
+      if (data.file) {
+        formData.append("avatar", data.file);
+      }
+  
+      const response = await api.patch(`${AUTH_URL}/avatar`, formData, {
+        headers: {
+          "x-client-id": userId,
+          Authorization: accessToken,
+        },
+      });
+  
+      return response.data.metadata;
+    } catch (error) {
+      const errorMessage = get(error, "response.data.error.message", "Unknown error occurred.");
+      toast.error(errorMessage);
+      throw new Error(errorMessage);
+    }
+  };
+  

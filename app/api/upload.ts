@@ -6,14 +6,14 @@ import get from 'lodash/get';
 
 const PRODUCT_URL = '/uploads/products'
 
-export const uploadProductImage = async (clientId: string, accessToken: string, file: File): Promise<Product.ProductDetailResponse> => {
+export const uploadProductImage = async (userId: string, accessToken: string, file: File): Promise<Product.ProductDetailResponse> => {
     try {
         const formData = new FormData();
         formData.append("mainImage", file); // Adjust based on backend requirements
         
         const response = await api.post(`${PRODUCT_URL}`, formData, {
             headers: {
-                'x-client-id': clientId,
+                'x-client-id': userId,
                 'Authorization': accessToken,
             },
         });

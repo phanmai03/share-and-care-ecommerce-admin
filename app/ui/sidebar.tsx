@@ -36,7 +36,7 @@ const Sidebar: React.FC<SidebarProps> = ({ showSidebar, setShowSidebar }) => {
     // { title: "Feedback", icon: MessagesSquare, href: "/dashboard/feedback" },
     // { title: "Blog", icon: ListTodo, href: "/dashboard/blog" },
     // { title: "Seller", icon: UserSquare2, href: "/dashboard/seller" },
-    // { title: "Customer", icon: Users2, href: "/dashboard/customer" },
+    { title: "User", icon: Users2, href: "/dashboard/user" },
     // { title: "Return Policy", icon: Settings, href: "/dashboard/return-policy" },
   ];
 

@@ -12,19 +12,19 @@ const ProductList: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(true);
   const router = useRouter();
 
-  const accessToken = sessionStorage.getItem('accessToken');
-  const clientId = process.env.NEXT_PUBLIC_ADMIN_ID;
+  const accessToken = localStorage.getItem('accessToken');
+  const userId= localStorage.getItem('userId')
 
   useEffect(() => {
     const fetchProducts = async () => {
-      if (!accessToken || !clientId) {
+      if (!accessToken || !userId) {
         setError('Missing access token or client ID');
         setLoading(false);
         return;
       }
 
       try {
-        const response: ProductResponse = await getAllProduct(clientId, accessToken);
+        const response: ProductResponse = await getAllProduct(userId, accessToken);
 
         if (response.products?.length) {
           setProducts(response.products);
@@ -40,7 +40,7 @@ const ProductList: React.FC = () => {
     };
 
     fetchProducts();
-  }, [accessToken, clientId]);
+  }, [accessToken, userId]);
 
   const handleView = (id: string) => {
     router.push(`all-product/${id}`);

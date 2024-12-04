@@ -5,11 +5,11 @@ import Image from "next/image";
 import Link from "next/link";
 import { FaEnvelope, FaSpinner } from "react-icons/fa";
 import { toast } from "react-toastify";
-import { forgotPassword } from '@/app/api/auth';
+import { updatePassword } from '@/app/api/auth';
 
 export default function Page() {
   const [formData, setFormData] = useState({
-    email: ''
+    email: '',
   });
   const [loading, setLoading] = useState(false);
 
@@ -19,17 +19,20 @@ export default function Page() {
     });
   };
 
-
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
+  const handleClick = async (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault(); // Prevents default behavior (in case it's within a form)
     setLoading(true);
+    
     try {
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      const response = await forgotPassword(formData);
-      toast.success("A reset password email has been sent to your inbox. Please check your email to receive password reset instructions.");
+      const isPanel = JSON.parse(localStorage.getItem("isPanel") || "false");
 
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    } catch (error) { } finally {
+      const response = await updatePassword(formData, isPanel);
+      toast.success("A reset password email has been sent to your inbox. Please check your email to receive password reset instructions.");
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    } catch (error) {
+      toast.error("There was an error sending the reset link. Please try again.");
+    } finally {
       setLoading(false);
     }
   };
@@ -45,7 +48,7 @@ export default function Page() {
             height={100}
             className="mx-auto"
           />
-          <h2 className="text-2xl font-semibold text-gray-800 mt-4">Forgot Password?</h2>
+          <h2 className="text-2xl font-semibold text-gray-800 mt-4">Update Password?</h2>
           <p className="text-sm text-gray-500 mt-2">
             Enter your registered email address and we’ll send you a reset link.
           </p>
@@ -68,10 +71,8 @@ export default function Page() {
 
         {/* Reset Button */}
         <button
-          onClick={handleSubmit}
-          className={`w-full flex items-center justify-center py-2 px-4 rounded-md font-medium text-white bg-[#38A59F] hover:bg-[#2F8F8A] transition focus:outline-none focus:ring-2 focus:ring-blue-400 ${
-            loading ? "opacity-50 cursor-not-allowed" : ""
-          }`}
+           onClick={handleClick}
+          className={`w-full flex items-center justify-center py-2 px-4 rounded-md font-medium text-white bg-[#38A59F] hover:bg-[#2F8F8A] transition focus:outline-none focus:ring-2 focus:ring-blue-400 ${loading ? "opacity-50 cursor-not-allowed" : ""}`}
           disabled={loading}
         >
           {loading && <FaSpinner className="mr-2 animate-spin" />}
@@ -80,7 +81,7 @@ export default function Page() {
 
         {/* Back to Login */}
         <div className="text-center mt-4">  
-          <Link href="/auth/login" className="text-[#38A59F] hover:underline text-sm">
+          <Link href="/dashboard" className="text-[#38A59F] hover:underline text-sm">
             Back to Login
           </Link>
         </div>
@@ -88,4 +89,3 @@ export default function Page() {
     </div>
   );
 };
-
