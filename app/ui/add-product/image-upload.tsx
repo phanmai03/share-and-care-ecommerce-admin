@@ -1,155 +1,75 @@
-import { ProductData } from "@/interface/product";
-import React, { useState, useEffect } from "react";
-import { toast } from "react-toastify";
-import Image from "next/image"; // Import next/image
+import React, { useState } from 'react';
+import { uploadProductImage } from '@/app/api/upload'; // Import hàm upload
+import { toast } from 'react-toastify';
+import Image from 'next/image';
 
 interface ImageUploadProps {
-  formData: ProductData;
-  setFormData: React.Dispatch<React.SetStateAction<ProductData>>;
-  onChange: (mainImage: string, subImages: Array<string>) => void;
+ formData: any;
+  setFormData: React.Dispatch<React.SetStateAction<any>>;
+  userId: string;
+  accessToken: string;
 }
 
-const ImageUpload: React.FC<ImageUploadProps> = ({ formData, setFormData, onChange }) => {
-  const [mainImage, setMainImage] = useState<File | null>(null);
-  const [subImages, setSubImages] = useState<File[]>([]);
+const ImageUpload: React.FC<ImageUploadProps> = ({ userId, accessToken, formData, setFormData }) => {
+  const [loading, setLoading] = useState<boolean>(false); // Loading state
 
-  useEffect(() => {
-    // Pre-fill the form with current formData images if available
-    if (formData.mainImage) {
-      setMainImage(formData.mainImage ? new File([formData.mainImage], "main-image") : null);
-    }
-    if (formData.subImages.length) {
-      setSubImages(formData.subImages.map((subImage) => new File([subImage], "sub-image")));
-    }
-  }, [formData]);
+  // Handle the file change event
+  const handleImageChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0]; // Get the first file selected by the user
+    if (!file) return;
 
-  const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const files = event.target.files;
-    if (!files) return;
-
-    let newMainImage = mainImage || null;
-    const newSubImages: File[] = [...subImages];
-
-    for (let i = 0; i < files.length; i++) {
-      const file = files[i];
-      if (file.size > 2 * 1024 * 1024) {
-        toast.error(`File "${file.name}" exceeds 2MB and will not be added.`);
-        continue;
-      }
-
-      if (!file.type.startsWith("image/")) {
-        toast.error(`File "${file.name}" is not a valid image.`);
-        continue;
-      }
-
-      if (!newMainImage) {
-        newMainImage = file; // Set main image if not already set
-      } else {
-        newSubImages.push(file); // Add to sub images if main image is set
-      }
+    // Check file size before upload (optional, example: 2MB max)
+    if (file.size > 2 * 1024 * 1024) {
+      toast.error("File exceeds 2MB and will not be uploaded.");
+      return;
     }
 
-    setMainImage(newMainImage);
-    setSubImages(newSubImages);
+    setLoading(true); // Set loading to true while uploading
+    try {
+      // Call the upload function and get the image URL
+      const uploadedImageUrl = await uploadProductImage({ file }, userId, accessToken);
+      console.log("Uploaded Image URL:", uploadedImageUrl);
 
-    // Call onChange to update the parent component with the new image data
-    onChange(
-      newMainImage ? URL.createObjectURL(newMainImage) : "",
-      newSubImages.map((file) => URL.createObjectURL(file))
-    );
+      // Save the URL in formData.mainImage
+      setFormData((prev) => ({
+        ...prev,
+        mainImage: uploadedImageUrl.metadata, // Store the URL in the mainImage field
+      }));
 
-    setFormData((prevData) => ({
-      ...prevData,
-      mainImage: newMainImage ? URL.createObjectURL(newMainImage) : "",
-      subImages: newSubImages.map((file) => URL.createObjectURL(file)),
-    }));
+      toast.success("Image uploaded successfully!");
+    } catch (error) {
+      toast.error("Failed to upload image.");
+    } finally {
+      setLoading(false); // Set loading to false when upload is done
+    }
   };
 
-  // const handleUpload = () => {
-  //   if (!mainImage) {
-  //     toast.error("Please select a main image to upload.");
-  //     return;
-  //   }
-
-  //   try {
-  //     const mainImageUrl = URL.createObjectURL(mainImage);
-  //     const subImageUrls = subImages.map((file) => URL.createObjectURL(file));
-
-  //     // After "upload", call the onChange to propagate the new image URLs back to the parent component
-  //     onChange(mainImageUrl, subImageUrls);
-
-  //     toast.success("Product images processed successfully!");
-  //   } catch (error) {
-  //     console.error("Error processing images:", error);
-  //     toast.error("Failed to process images.");
-  //   }
-  // };
-
   return (
-    <div className="max-w-4xl mx-auto p-6">
-      <h2 className="text-lg font-semibold mb-4">Product Upload</h2>
+    <div className="image-upload-container">
+      <h3>Upload Product Image</h3>
+      
+      {/* File input */}
+      <input type="file" accept="image/*" onChange={handleImageChange} />
+      
+      {/* Show loading indicator if uploading */}
+      {loading && <p>Uploading...</p>}
 
-      <label
-        htmlFor="file-upload"
-        className="w-full h-72 p-4 border border-dashed border-gray-300 rounded-md text-center cursor-pointer bg-gray-50 hover:bg-gray-100 flex items-center justify-center"
-      >
-        <span className="text-gray-500">
-          Drop files here or click to browse through your machine.
-        </span>
-        <input
-          type="file"
-          id="file-upload"
-          accept="image/*"
-          multiple
-          onChange={handleFileUpload}
-          className="hidden"
-        />
-      </label>
-
-      {/* Display Main Image */}
-      {mainImage && (
-        <div className="mt-4">
-          <h3 className="text-sm font-medium text-gray-700">Main Image:</h3>
-          <div className="mt-2 flex items-center">
-            <Image
-              src={URL.createObjectURL(mainImage)}
-              alt="Main"
-              width={128}
-              height={128}
-              className="object-cover border rounded"
-            />
-          </div>
+      {/* Display image preview after successful upload */}
+      {formData.mainImage && !loading && (
+        <div className="image-preview">
+          <h4>Image Preview:</h4>
+          <Image
+            src={formData.mainImage} // Use the URL from formData
+            alt="Uploaded Product"
+            width={300} // Customize size as needed
+            height={300}
+            className="image-thumbnail"
+          />
         </div>
       )}
-
-      {/* Display Sub Images */}
-      {subImages.length > 0 && (
-        <div className="mt-4">
-          <h3 className="text-sm font-medium text-gray-700">Sub Images:</h3>
-          <div className="mt-2 grid grid-cols-5 gap-2">
-            {subImages.map((file, index) => (
-              <div key={index} className="relative">
-                <Image
-                  src={URL.createObjectURL(file)}
-                  alt={`Sub ${index}`}
-                  width={80}
-                  height={80}
-                  className="object-cover border rounded"
-                />
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* <button
-        onClick={handleUpload}
-        className="mt-6 px-6 py-2 rounded-lg text-white shadow bg-[#38A59F] hover:bg-[#2F8F8A] transition"
-      >
-        Process Images
-      </button> */}
     </div>
   );
 };
+
 
 export default ImageUpload;

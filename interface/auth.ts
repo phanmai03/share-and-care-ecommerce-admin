@@ -36,7 +36,6 @@ export interface LoginDataResponse {
 
 export interface ForgotPasswordData {
     email: string;  
-    // isPanel: boolean;
 }
 
 export interface ResetPasswordData {
@@ -49,6 +48,6 @@ export interface UploadAvatar{
 }
 
 export interface UploadAvatarResponse{
-    image_url: string;  
+    metadata: string;  
 }
 

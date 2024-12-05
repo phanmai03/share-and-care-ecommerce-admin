@@ -97,7 +97,6 @@ export interface ProductDataDetailResponse {
 }
 }
 
-
 export interface ProductUpdate{
   id: string,
   name: string,
@@ -122,4 +121,15 @@ export interface ProductUpdate{
 export interface ProductUpdateResponse{
   products: ProductUpdate[],
 }
+
+export interface UploadProduct{
+  file: File;  
+}
+
+export interface UploadProductResponse{
+  metadata: string;  
+}
+
+
+
 
