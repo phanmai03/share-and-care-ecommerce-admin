@@ -7,6 +7,8 @@ import { ProductData } from '@/interface/product';
 interface ImageUploadProps {
   formData: ProductData;
   setFormData: React.Dispatch<React.SetStateAction<ProductData>>;
+  userId: string | null; // Add userId here
+  accessToken: string |null;
 }
 
 const ImageUpload: React.FC<ImageUploadProps> = ({ formData, setFormData }) => {
