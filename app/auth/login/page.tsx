@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import Image from "next/image";
-import { FaGoogle, FaFacebook } from "react-icons/fa";
+// import { FaGoogle, FaFacebook } from "react-icons/fa";
 import { useRouter } from "next/navigation";
 import { Mail, Lock } from "lucide-react";
 import { toast } from "react-toastify";
@@ -70,9 +70,9 @@ const LoginForm = () => {
 
     localStorage.setItem("isPanel", "true")
 
-    const handleGoogleSignIn = () => {
-        alert("Google Sign-In not implemented.");
-    };
+    // const handleGoogleSignIn = () => {
+    //     alert("Google Sign-In not implemented.");
+    // };
 
     return (
         <div className="flex items-center justify-center min-h-screen bg-gray-50">
@@ -181,17 +181,17 @@ const LoginForm = () => {
                         </div>
 
                         {/* Social Login Buttons */}
-                        <div className="flex space-x-4 justify-center mt-4">
+                        {/* <div className="flex space-x-4 justify-center mt-4"> */}
                             {/* Google Login */}
-                            <button
+                            {/* <button
                                 type="button"
                                 onClick={handleGoogleSignIn}
                                 className="w-12 h-12 flex items-center justify-center rounded-full bg-[#dc2626] hover:bg-[#b91c1c] transition focus:outline-none focus:ring-2 focus:ring-red-400"
-                            >
-                                <FaGoogle className="text-white text-2xl" />
+                            > */}
+                                {/* <FaGoogle className="text-white text-2xl" />
                             </button>
 
-                        </div>
+                        </div> */}
                     </form>
                 </div>
             </div>
