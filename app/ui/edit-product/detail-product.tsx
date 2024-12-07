@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from "react";
 import { getAllCategories, getChildCategories } from "@/app/api/category";
 import { toast } from "react-toastify";
-import { Category, ProductData } from "@/interface/product";
+import { Category, ProductDataEdit } from "@/interface/product";
 
 interface ProductFormProps {
-  formData: ProductData;
-  setFormData: React.Dispatch<React.SetStateAction<ProductData>>;
+  formData: ProductDataEdit;
+  setFormData: React.Dispatch<React.SetStateAction<ProductDataEdit>>;
 }
 
 const CreateProductForm: React.FC<ProductFormProps> = ({ formData, setFormData }) => {
@@ -99,7 +99,6 @@ const CreateProductForm: React.FC<ProductFormProps> = ({ formData, setFormData }
   return (
     <div className="max-w-4xl mx-auto p-6">
       <h2 className="text-lg font-semibold mb-4">Add Product</h2>
-<<<<<<< Updated upstream
       <div className="space-y-6">
         <div>
           <label className="block text-sm font-medium text-gray-700">Product Name</label>
@@ -177,55 +176,11 @@ const CreateProductForm: React.FC<ProductFormProps> = ({ formData, setFormData }
                   ✕
                 </button>
               </li>
-=======
-
-      <div>
-        <label className="block text-sm font-medium text-gray-700">Product Name</label>
-        <input
-          type="text"
-          name="name"
-          placeholder="Product name"
-          value={formData.name}
-          onChange={handleChange}
-          className="w-full mt-1 p-2 border rounded-md shadow-sm"
-          required
-        />
-      </div>
-
-      <div>
-        <label className="block text-sm font-medium text-gray-700">Description</label>
-        <textarea
-          name="description"
-          placeholder="Product description"
-          value={formData.description}
-          onChange={handleChange}
-          className="w-full mt-1 p-2 border rounded-md shadow-sm"
-        />
-      </div>
-
-      <div>
-        <label className="block text-sm font-medium text-gray-700">Select Category</label>
-        {isLoading ? (
-          <p>Loading categories...</p>
-        ) : (
-          <select
-            name="parentCategory"
-            value={selectedParentCategory || ""}
-            onChange={handleParentCategorySelect}
-            className="w-full mt-1 p-2 border rounded-md shadow-sm"
-          >
-            <option value="" disabled>Select a category</option>
-            {categories.map((cat) => (
-              <option key={cat.id} value={cat.id}>{cat.name}</option>
->>>>>>> Stashed changes
             ))}
-          </select>
+          </ul>
         )}
-      </div>
 
-      {selectedParentCategory && childCategories[selectedParentCategory] && (
         <div>
-<<<<<<< Updated upstream
           <label className="block text-sm font-medium text-gray-700">Attributes</label>
           <div className="flex flex-wrap gap-2 p-2 border rounded-md shadow-sm">
             {formData.attributes?.map((attr, index) => (
@@ -238,70 +193,18 @@ const CreateProductForm: React.FC<ProductFormProps> = ({ formData, setFormData }
                 >
                   ✕
                 </button>
-=======
-          <div className="space-y-2 ml-4">
-            {childCategories[selectedParentCategory].map((child) => (
-              <div key={child.id} className="flex items-center">
-                <input
-                  type="checkbox"
-                  id={child.id}
-                  onChange={() => handleCategoryChange(child.id)}
-                  checked={formData.category.some((c) => c.id === child.id)}
-                  className="mr-2"
-                />
-                <label htmlFor={child.id}>{child.name}</label>
->>>>>>> Stashed changes
               </div>
             ))}
+            <input
+              type="text"
+              value={attributeInput}
+              onChange={handleAttributeInput}
+              onKeyDown={handleAttributeKeyDown}
+              placeholder="Add attributes and press Enter"
+              className="flex-1 bg-transparent outline-none"
+            />
           </div>
         </div>
-<<<<<<< Updated upstream
-=======
-      )}
-
-      {formData.category?.length > 0 && (
-        <ul className="mt-2 flex flex-wrap gap-2">
-          {formData.category.map((cat) => (
-            <li key={cat.id} className="flex items-center bg-gray-200 px-3 py-1 rounded-md space-x-2">
-              <span>{cat.name}</span>
-              <button
-                type="button"
-                onClick={() => handleCategoryChange(cat.id)}
-                className="text-red-500 ml-2 focus:outline-none"
-                aria-label={`Remove ${cat.name}`}
-              >
-                ✕
-              </button>
-            </li>
-          ))}
-        </ul>
-      )}
-
-      <div>
-        <label className="block text-sm font-medium text-gray-700">Attributes</label>
-        <div className="flex flex-wrap gap-2 p-2 border rounded-md shadow-sm bg-gray-50">
-          {formData.attributes?.map((attr, index) => (
-            <div key={index} className="flex items-center bg-blue-100 text-blue-600 px-3 py-1 rounded-full">
-              {attr}
-              <button
-                type="button"
-                onClick={() => removeAttribute(attr)}
-                className="ml-2 text-red-500 focus:outline-none"
-              >
-                ✕
-              </button>
-            </div>
-          ))}
-          <input
-            type="text"
-            value={attributeInput}
-            onChange={handleAttributeInput}
-            onKeyDown={handleAttributeKeyDown}
-            placeholder="Add attributes and press Enter"
-            className="flex-1 bg-transparent outline-none"
-          />
-        </div>
->>>>>>> Stashed changes
       </div>
     </div>
   );

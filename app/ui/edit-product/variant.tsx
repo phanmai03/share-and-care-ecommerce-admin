@@ -1,54 +1,56 @@
 import React, { useState, useEffect } from "react";
 import Image from "next/image";
-import { ProductData, Variants, SkuList } from "@/interface/product";
+import { ProductDataEdit, Variants, SkuList } from "@/interface/product";
 import { toast } from "react-toastify";
 import { uploadProductImage } from "@/app/api/upload";
 
-<<<<<<< Updated upstream
 interface VariantProps {
-  setFormData: React.Dispatch<React.SetStateAction<ProductData>>;
-}
-
-const ProductVariants: React.FC<VariantProps> = ({ setFormData }) => {
-  const initialVariants: Variants[] = [
-    {
-      name: "Color",
-      images: [],
-      options: [""],
-    },
-    {
-      name: "Size",
-      images: [],
-      options: [""],
-    },
-  ];
-=======
-import { ProductData } from "@/interface/product";
-import React, { useState, useCallback, useMemo } from "react";
-
-interface VariantProps {
-  formData: ProductData;
-  setFormData: React.Dispatch<React.SetStateAction<ProductData>>;
-}
-
-interface VariantGroup {
-  id: number;
-  name: string;
-  options: Array<{ value: string; image: string | null }>;
+  formData: ProductDataEdit;
+  setFormData: React.Dispatch<React.SetStateAction<ProductDataEdit>>;
 }
 
 const ProductVariants: React.FC<VariantProps> = ({ formData, setFormData }) => {
-  const [variantGroups, setVariantGroups] = useState<VariantGroup[]>([
-    { id: 1, name: "", options: [] },
-  ]);
->>>>>>> Stashed changes
+  const [variants, setVariants] = useState<Variants[]>(formData.variants || []);
+  const [skuList, setSkuList] = useState<SkuList[]>(formData.skuList || []);
+  const [variantCombinations, setVariantCombinations] = useState<{ color: string, size: string, price: number, quantity: number }[]>([]);
+
+  useEffect(() => {
+    if (formData) {
+      const colorVariant = formData.variants.find(item => item.name === "Color");
+      const sizeVariant = formData.variants.find(item => item.name === "Size");
+
+      setVariants([
+        {
+          name: "Color",
+          images: colorVariant?.images || [],
+          options: colorVariant?.options || [],
+        },
+        {
+          name: "Size",
+          images: [],
+          options: sizeVariant?.options || [],
+        },
+      ]);
+
+      // Initialize variant combinations based on existing data
+      const colorOptions = colorVariant?.options || [];
+      const sizeOptions = sizeVariant?.options || [];
+
+      const newCombinations = colorOptions.flatMap(color =>
+        sizeOptions.map(size => ({
+          color,
+          size,
+          price: 0, // Default price
+          quantity: 0 // Default quantity
+        }))
+      );
+
+      setVariantCombinations(newCombinations);
+    }
+  }, [formData]);
 
   const userId = localStorage.getItem('userId');
   const accessToken = localStorage.getItem('accessToken');
-
-  const [variants, setVariants] = useState<Variants[]>(initialVariants);
-  const [skuList, setSkuList] = useState<SkuList[]>([]);
-  const [variantCombinations, setVariantCombinations] = useState<{ color: string, size: string, price: number, quantity: number }[]>([]);
 
   const updateOption = (variantIndex: number, optionIndex: number, value: string) => {
     const newVariants = [...variants];
@@ -59,7 +61,6 @@ const ProductVariants: React.FC<VariantProps> = ({ formData, setFormData }) => {
   const addOption = (index: number) => {
     const lastOption = variants[index].options[variants[index].options.length - 1];
 
-<<<<<<< Updated upstream
     if (lastOption.trim() === "") {
       toast.error("Cannot add option. Please fill the last option first.");
       return;
@@ -67,102 +68,6 @@ const ProductVariants: React.FC<VariantProps> = ({ formData, setFormData }) => {
 
     const newVariants = [...variants];
     newVariants[index].options.push("");
-=======
-  const addOptionToGroup = (groupId: number) => {
-    setVariantGroups((prev) =>
-      prev.map((group) =>
-        group.id === groupId
-          ? { ...group, options: [...group.options, { value: "", image: null }] }
-          : group
-      )
-    );
-  };
-
-  const updateOption = (
-    groupId: number,
-    optionIndex: number,
-    value: string
-  ) => {
-    setVariantGroups((prev) =>
-      prev.map((group) =>
-        group.id === groupId
-          ? {
-            ...group,
-            options: group.options.map((opt, idx) =>
-              idx === optionIndex ? { ...opt, value } : opt
-            ),
-          }
-          : group
-      )
-    );
-  };
-
-  const updateOptionImage = (
-    groupId: number,
-    optionIndex: number,
-    image: string
-  ) => {
-    setVariantGroups((prev) =>
-      prev.map((group) =>
-        group.id === groupId
-          ? {
-            ...group,
-            options: group.options.map((opt, idx) =>
-              idx === optionIndex ? { ...opt, image } : opt
-            ),
-          }
-          : group
-      )
-    );
-  };
-
-  const removeOption = (groupId: number, optionIndex: number) => {
-    setVariantGroups((prev) =>
-      prev.map((group) =>
-        group.id === groupId
-          ? {
-            ...group,
-            options: group.options.filter((_, idx) => idx !== optionIndex),
-          }
-          : group
-      )
-    );
-  };
-
-  const removeVariantGroup = (id: number) => {
-    setVariantGroups((prev) => prev.filter((group) => group.id !== id));
-  };
-
-  const generateGroupedCombinations = useCallback(() => {
-    const groupMap = variantGroups.reduce((acc, group) => {
-      if (group.name.trim() && group.options.some((opt) => opt.value.trim())) {
-        acc[group.name] = group.options.filter((opt) => opt.value.trim());
-      }
-      return acc;
-    }, {} as Record<string, { value: string; image: string | null }[]>);
-
-    if (!groupMap["Màu sắc"] && !groupMap["Kích cỡ"]) return [];
-
-    const primaryGroup = groupMap["Màu sắc"] || [];
-    const secondaryGroup = groupMap["Kích cỡ"] || [];
-
-    if (primaryGroup.length === 0) {
-      return secondaryGroup.map((secondaryOption) => ({
-        primaryOption: null,
-        secondaryOption,
-      }));
-    }
-
-    return primaryGroup.flatMap((primaryOption) =>
-      secondaryGroup.length > 0
-        ? secondaryGroup.map((secondaryOption) => ({
-          primaryOption,
-          secondaryOption,
-        }))
-        : [{ primaryOption, secondaryOption: null }]
-    );
-  }, [variantGroups]);
->>>>>>> Stashed changes
 
     // Update the variant combinations and SKU list
     const colorOptions = newVariants[0].options.filter(option => option.trim() !== "");
@@ -227,36 +132,27 @@ const ProductVariants: React.FC<VariantProps> = ({ formData, setFormData }) => {
         });
 
         // Update formData
-        setFormData((prev: ProductData) => {
+        setFormData((prev: ProductDataEdit) => {
           if (!prev.mainImage) {
             return {
               ...prev,
               mainImage: imageUrlString,
-            } as ProductData;
+            } as ProductDataEdit;
           } else {
             return {
               ...prev,
               subImages: [...prev.subImages, imageUrlString],
-            } as ProductData;
+            } as ProductDataEdit;
           }
         });
 
         toast.success("Image uploaded successfully!");
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
       } catch (error) {
         toast.error("Failed to upload image.");
       }
     }
   };
-
-  useEffect(() => {
-    const filteredVariants = variants.map(variant => ({
-      ...variant,
-      options: variant.options.filter(option => option.trim() !== "")
-    }));
-
-    setFormData((prevFormData) => ({ ...prevFormData, variants: filteredVariants, skuList }));
-  }, [variants, skuList, setFormData]);
 
   const handleInputChange = (index: number, field: 'price' | 'quantity', value: string) => {
     const newCombinations = [...variantCombinations];
@@ -272,24 +168,6 @@ const ProductVariants: React.FC<VariantProps> = ({ formData, setFormData }) => {
     setSkuList(newSkuList);
   };
 
-  // Update formData with current variants
-  React.useEffect(() => {
-    const variants = groupedCombinations.map((group) => ({
-      color: group.color,
-      image: group.image,
-      sizes: group.sizes,
-    }));
-
-    setFormData((prevData) => ({
-      ...prevData,
-      variants,
-    }));
-  }, [groupedCombinations, setFormData]);
-<<<<<<< Updated upstream
-  
-=======
-
->>>>>>> Stashed changes
   return (
     <div className="max-w-4xl mx-auto p-6 space-y-4">
       <h2 className="text-lg font-semibold">Product Variants</h2>
@@ -359,14 +237,18 @@ const ProductVariants: React.FC<VariantProps> = ({ formData, setFormData }) => {
           </tr>
         </thead>
         <tbody>
-          {variantCombinations.map((combination, index) => (
+          {skuList.map((sku, index) => (
             <tr key={index}>
-              <td className="border border-gray-300 p-2 text-lg">{combination.color}</td>
-              <td className="border border-gray-300 p-2 text-lg">{combination.size}</td>
+              <td className="border border-gray-300 p-2 text-lg">
+                {variants[0].options[sku.tierIndex[0]]} {/* Color */}
+              </td>
+              <td className="border border-gray-300 p-2 text-lg">
+                {variants[1].options[sku.tierIndex[1]]} {/* Size */}
+              </td>
               <td className="border border-gray-300 p-2">
                 <input
                   type="number"
-                  value={combination.price}
+                  value={sku.price}
                   onChange={(e) => handleInputChange(index, 'price', e.target.value)}
                   className="w-full p-1 border rounded text-lg"
                 />
@@ -374,7 +256,7 @@ const ProductVariants: React.FC<VariantProps> = ({ formData, setFormData }) => {
               <td className="border border-gray-300 p-2">
                 <input
                   type="number"
-                  value={combination.quantity}
+                  value={sku.quantity}
                   onChange={(e) => handleInputChange(index, 'quantity', e.target.value)}
                   className="w-full p-1 border rounded text-lg"
                 />
