@@ -77,6 +77,8 @@ const Page = () => {
             <Images
               formData={formData}
               setFormData={setFormData}
+              userId={userId}
+              accessToken={accessToken}
             />
 
 
