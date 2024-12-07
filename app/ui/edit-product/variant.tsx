@@ -1,33 +1,56 @@
 import React, { useState, useEffect } from "react";
 import Image from "next/image";
-import { ProductData, Variants, SkuList } from "@/interface/product";
+import { ProductDataEdit, Variants, SkuList } from "@/interface/product";
 import { toast } from "react-toastify";
 import { uploadProductImage } from "@/app/api/upload";
 
 interface VariantProps {
-  setFormData: React.Dispatch<React.SetStateAction<ProductData>>;
+  formData: ProductDataEdit;
+  setFormData: React.Dispatch<React.SetStateAction<ProductDataEdit>>;
 }
 
-const ProductVariants: React.FC<VariantProps> = ({ setFormData }) => {
-  const initialVariants: Variants[] = [
-    {
-      name: "Color",
-      images: [],
-      options: [""],
-    },
-    {
-      name: "Size",
-      images: [],
-      options: [""],
-    },
-  ];
+const ProductVariants: React.FC<VariantProps> = ({ formData, setFormData }) => {
+  const [variants, setVariants] = useState<Variants[]>(formData.variants || []);
+  const [skuList, setSkuList] = useState<SkuList[]>(formData.skuList || []);
+  const [variantCombinations, setVariantCombinations] = useState<{ color: string, size: string, price: number, quantity: number }[]>([]);
+
+  useEffect(() => {
+    if (formData) {
+      const colorVariant = formData.variants.find(item => item.name === "Color");
+      const sizeVariant = formData.variants.find(item => item.name === "Size");
+
+      setVariants([
+        {
+          name: "Color",
+          images: colorVariant?.images || [],
+          options: colorVariant?.options || [],
+        },
+        {
+          name: "Size",
+          images: [],
+          options: sizeVariant?.options || [],
+        },
+      ]);
+
+      // Initialize variant combinations based on existing data
+      const colorOptions = colorVariant?.options || [];
+      const sizeOptions = sizeVariant?.options || [];
+
+      const newCombinations = colorOptions.flatMap(color =>
+        sizeOptions.map(size => ({
+          color,
+          size,
+          price: 0, // Default price
+          quantity: 0 // Default quantity
+        }))
+      );
+
+      setVariantCombinations(newCombinations);
+    }
+  }, [formData]);
 
   const userId = localStorage.getItem('userId');
   const accessToken = localStorage.getItem('accessToken');
-
-  const [variants, setVariants] = useState<Variants[]>(initialVariants);
-  const [skuList, setSkuList] = useState<SkuList[]>([]);
-  const [variantCombinations, setVariantCombinations] = useState<{ color: string, size: string, price: number, quantity: number }[]>([]);
 
   const updateOption = (variantIndex: number, optionIndex: number, value: string) => {
     const newVariants = [...variants];
@@ -109,36 +132,27 @@ const ProductVariants: React.FC<VariantProps> = ({ setFormData }) => {
         });
 
         // Update formData
-        setFormData((prev: ProductData) => {
+        setFormData((prev: ProductDataEdit) => {
           if (!prev.mainImage) {
             return {
               ...prev,
               mainImage: imageUrlString,
-            } as ProductData;
+            } as ProductDataEdit;
           } else {
             return {
               ...prev,
               subImages: [...prev.subImages, imageUrlString],
-            } as ProductData;
+            } as ProductDataEdit;
           }
         });
 
         toast.success("Image uploaded successfully!");
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
       } catch (error) {
         toast.error("Failed to upload image.");
       }
     }
   };
-
-  useEffect(() => {
-    const filteredVariants = variants.map(variant => ({
-      ...variant,
-      options: variant.options.filter(option => option.trim() !== "")
-    }));
-
-    setFormData((prevFormData) => ({ ...prevFormData, variants: filteredVariants, skuList }));
-  }, [variants, skuList, setFormData]);
 
   const handleInputChange = (index: number, field: 'price' | 'quantity', value: string) => {
     const newCombinations = [...variantCombinations];
@@ -223,14 +237,18 @@ const ProductVariants: React.FC<VariantProps> = ({ setFormData }) => {
           </tr>
         </thead>
         <tbody>
-          {variantCombinations.map((combination, index) => (
+          {skuList.map((sku, index) => (
             <tr key={index}>
-              <td className="border border-gray-300 p-2 text-lg">{combination.color}</td>
-              <td className="border border-gray-300 p-2 text-lg">{combination.size}</td>
+              <td className="border border-gray-300 p-2 text-lg">
+                {variants[0].options[sku.tierIndex[0]]} {/* Color */}
+              </td>
+              <td className="border border-gray-300 p-2 text-lg">
+                {variants[1].options[sku.tierIndex[1]]} {/* Size */}
+              </td>
               <td className="border border-gray-300 p-2">
                 <input
                   type="number"
-                  value={combination.price}
+                  value={sku.price}
                   onChange={(e) => handleInputChange(index, 'price', e.target.value)}
                   className="w-full p-1 border rounded text-lg"
                 />
@@ -238,7 +256,7 @@ const ProductVariants: React.FC<VariantProps> = ({ setFormData }) => {
               <td className="border border-gray-300 p-2">
                 <input
                   type="number"
-                  value={combination.quantity}
+                  value={sku.quantity}
                   onChange={(e) => handleInputChange(index, 'quantity', e.target.value)}
                   className="w-full p-1 border rounded text-lg"
                 />
