@@ -6,7 +6,7 @@ import Images from "@/app/ui/add-product/image-upload";
 import Property from "@/app/ui/add-product/property";
 import { toast } from "react-toastify";
 import { createProduct } from "@/app/api/product";
-import { ProductData, ProductDetailResponse } from "@/interface/product";
+import { ProductData } from "@/interface/product";
 import ProductVariants from "@/app/ui/add-product/variant";
 
 const Page = () => {
@@ -28,13 +28,6 @@ const Page = () => {
   const accessToken = localStorage.getItem('accessToken');
   const userId = localStorage.getItem('userId')
 
-  const handleChange = (key: string, value: unknown) => {
-    setFormData((prev) => ({
-      ...prev,
-      [key]: value,
-    }));
-  }
-
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
@@ -43,10 +36,33 @@ const Page = () => {
       return;
     }
 
-    try {
+    // Define the required string fields
+    const requiredStringFields: (keyof ProductData)[] = [
+      "name",
+      "description",
+      "mainImage", // Assuming mainImage is required
+    ];
 
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      const response: ProductDetailResponse = await createProduct(
+    // Validation: Check for empty string fields in formData
+    for (const field of requiredStringFields) {
+      if (!formData[field] || (typeof formData[field] === "string" && formData[field].trim() === "")) {
+        toast.error(`Please fill in the ${field}.`);
+        return;
+      }
+    }
+
+    // Check numeric fields
+    const numericFields: (keyof ProductData)[] = ["price", "originalPrice", "quantity"];
+    for (const field of numericFields) {
+      const value = formData[field];
+      if (typeof value !== "number" || value <= 0) {
+        toast.error(`${field} must be a number greater than 0.`);
+        return;
+      }
+    }
+
+    try {
+      await createProduct(
         { ...formData },
         userId,
         accessToken
@@ -67,7 +83,7 @@ const Page = () => {
       <Heading title="Add Product" />
       <div className="flex justify-center items-center mt-6">
         <div className="bg-white max-w-4xl w-full p-6 rounded-lg shadow-lg">
-          <form onSubmit={handleSubmit} className="space-y-6">
+          <form onSubmit={handleSubmit}>
             {/* Product Details */}
             <Detail formData={formData} setFormData={setFormData} />
             {/* Product Images */}
@@ -78,22 +94,21 @@ const Page = () => {
               accessToken={accessToken}
             />
 
+            <Property formData={formData} setFormData={setFormData} />
 
             {/* Conditionally Render Properties or Variants */}
-            {isAddingVariants ? (
-              <ProductVariants formData={formData} setFormData={setFormData} />
-            ) : (
-              <Property formData={formData} setFormData={setFormData} />
+            {isAddingVariants && (
+              <ProductVariants setFormData={setFormData} />
             )}
 
             {/* Toggle to show properties or variants */}
-            <div className="flex justify-between items-center mb-6">
+            <div className="flex justify-between items-center my-6">
               <button
                 type="button"
                 onClick={handleToggleVariants}
                 className="px-4 py-2 text-sm border border-dashed border-gray-300 rounded-md text-gray-500 hover:border-gray-400"
               >
-                {isAddingVariants ? "Cancel Adding Variants" : "Add Variants"}
+                {isAddingVariants ? "Cancel Add Variants" : "Add Variants"}
               </button>
             </div>
 

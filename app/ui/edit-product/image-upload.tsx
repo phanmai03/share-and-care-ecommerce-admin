@@ -2,11 +2,11 @@ import React, { useState } from 'react';
 import { uploadProductImage } from '@/app/api/upload'; // Import upload function
 import { toast } from 'react-toastify';
 import Image from 'next/image';
-import { ProductData } from '@/interface/product';
+import { ProductDataEdit } from '@/interface/product';
 
 interface ImageUploadProps {
-  formData: ProductData;
-  setFormData: React.Dispatch<React.SetStateAction<ProductData>>;
+  formData: ProductDataEdit;
+  setFormData: React.Dispatch<React.SetStateAction<ProductDataEdit>>;
 }
 
 const ImageUpload: React.FC<ImageUploadProps> = ({ formData, setFormData }) => {
@@ -34,17 +34,17 @@ const ImageUpload: React.FC<ImageUploadProps> = ({ formData, setFormData }) => {
     if (userId && accessToken) {
       try {
         const uploadedImageUrl = await uploadProductImage({ file }, userId, accessToken);
-        setFormData((prev: ProductData) => {
+        setFormData((prev: ProductDataEdit) => {
           if (!prev.mainImage) {
             return {
               ...prev,
               mainImage: uploadedImageUrl.toString(),
-            } as ProductData;
+            } as ProductDataEdit;
           } else {
             return {
               ...prev,
               subImages: [...prev.subImages, uploadedImageUrl.toString()],
-            } as ProductData;
+            } as ProductDataEdit;
           }
         });
 
@@ -60,7 +60,7 @@ const ImageUpload: React.FC<ImageUploadProps> = ({ formData, setFormData }) => {
   };
 
   const deleteMainImage = () => {
-    setFormData((prev: ProductData) => ({
+    setFormData((prev: ProductDataEdit) => ({
       ...prev,
       mainImage: '',
     }));
@@ -68,7 +68,7 @@ const ImageUpload: React.FC<ImageUploadProps> = ({ formData, setFormData }) => {
   };
 
   const deleteImage = (index: number) => {
-    setFormData((prev: ProductData) => ({
+    setFormData((prev: ProductDataEdit) => ({
       ...prev,
       subImages: prev.subImages.filter((_, imgIndex) => imgIndex !== index),
     }));

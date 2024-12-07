@@ -76,9 +76,47 @@ export const getProductDetail = async (id: string, userId: string, accessToken: 
   }
 };
 
-export const updateProduct = async (data: Product.ProductResponse, userId: string, accessToken: string): Promise<Product.ProductUpdateResponse> => {
+export const updateProduct = async (data: Product.ProductData, userId: string, accessToken: string): Promise<Product.ProductUpdateResponse> => {
   try {
     const response = await api.patch(`${PRODUCT_URL}`, data, {
+      headers: {
+        'x-client-id': userId,
+        'Authorization': accessToken
+      }
+    });
+    return response.data.metadata;
+  } catch (error) {
+    const errorMessage = get(error, 'response.data.error.message', '');
+
+    if (errorMessage) {
+      toast.error(errorMessage);
+    }
+    throw new Error(errorMessage || 'An unknown error occurred.');
+  }
+};
+
+export const publishProduct = async (id: string, userId: string, accessToken: string): Promise<Product.PublishProductResponse> => {
+  try {
+    const response = await api.patch(`${PRODUCT_URL}/publish/${id}`, null, {
+      headers: {
+        'x-client-id': userId,
+        'Authorization': accessToken
+      }
+    });
+    return response.data.metadata;
+  } catch (error) {
+    const errorMessage = get(error, 'response.data.error.message', '');
+
+    if (errorMessage) {
+      toast.error(errorMessage);
+    }
+    throw new Error(errorMessage || 'An unknown error occurred.');
+  }
+};
+
+export const unPublishProduct = async (id: string, userId: string, accessToken: string): Promise<Product.PublishProductResponse> => {
+  try {
+    const response = await api.patch(`${PRODUCT_URL}/unpublish/${id}`, null, {
       headers: {
         'x-client-id': userId,
         'Authorization': accessToken

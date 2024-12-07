@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from "react";
 import { getAllCategories, getChildCategories } from "@/app/api/category";
 import { toast } from "react-toastify";
-import { Category, ProductData } from "@/interface/product";
+import { Category, ProductDataEdit } from "@/interface/product";
 
 interface ProductFormProps {
-  formData: ProductData;
-  setFormData: React.Dispatch<React.SetStateAction<ProductData>>;
+  formData: ProductDataEdit;
+  setFormData: React.Dispatch<React.SetStateAction<ProductDataEdit>>;
 }
 
 const CreateProductForm: React.FC<ProductFormProps> = ({ formData, setFormData }) => {

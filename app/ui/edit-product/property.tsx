@@ -1,9 +1,9 @@
-import { ProductData } from "@/interface/product";
+import { ProductDataEdit } from "@/interface/product";
 import React, { useState, useEffect } from "react";
 
 interface PropertyProps {
-  formData: ProductData;
-  setFormData: React.Dispatch<React.SetStateAction<ProductData>>;
+  formData: ProductDataEdit;
+  setFormData: React.Dispatch<React.SetStateAction<ProductDataEdit>>;
 }
 
 const PropertyForm: React.FC<PropertyProps> = ({ formData, setFormData }) => {
