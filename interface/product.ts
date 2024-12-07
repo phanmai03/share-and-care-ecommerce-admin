@@ -38,8 +38,8 @@ export interface ProductDataResponse {
   sold: number,
   status: string,
   rating: number,
-  views: number,
-  uniqueViews: string[],
+  views: number[],
+  uniqueViews: number,
   variants: Array<Variants>,
 }
 
