@@ -1,4 +1,3 @@
-
 "use client"
 import { useState, useEffect } from "react";
 import { CategoryData, CategoryDataResponse } from "@/interface/category";
@@ -25,7 +24,6 @@ export default function CategoryForm({ category, onSubmit }: CategoryFormProps) 
       try {
         const response = await getAllCategories();
         setCategories(response);
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       } catch (error) {
         toast.error("Failed to fetch categories.");
       }
@@ -66,19 +64,28 @@ export default function CategoryForm({ category, onSubmit }: CategoryFormProps) 
         };
 
         if (category) {
+          // Update the category
           await updateCategories({ ...payload, categoryId: category.id }, userId, accessToken);
           toast.success("Category updated successfully.");
         } else {
+          // Create a new category
           await createCategories(payload, userId, accessToken);
           toast.success("Category added successfully.");
         }
 
+        // Reset the form and trigger re-fetch
         setFormData({ name: "", parentId: null });
-        onSubmit(); // Trigger re-fetch
+        onSubmit(); // Trigger re-fetch of categories
+        
+        // Reset the `category` to null to switch back to "Add Category" mode
+        if (category) {
+          // If editing, return to "Add Category" mode
+          onSubmit(); // You can also pass a callback to reset `category` if needed
+        }
+
       } else {
         toast.error("Missing ID or access token.");
       }
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
       toast.error("Error submitting category. Please try again.");
     } finally {

@@ -1,9 +1,10 @@
+// /dashboard/delivery/DeliveriesCardList.tsx
 "use client";
 
 import React, { useEffect, useState } from "react";
 import { toast } from "react-toastify";
-import { getAllDelivery } from "@/app/api/delivery";
-import * as Delivery from "@/interface/delivery";
+import { getAllDelivery } from "@/app/api/delivery"; // Ensure this is correct API path
+import * as Delivery from "@/interface/delivery"; // Ensure this is correct interface path
 import { FaEdit } from "react-icons/fa";
 
 const DeliveriesCardList: React.FC = () => {
@@ -28,8 +29,7 @@ const DeliveriesCardList: React.FC = () => {
         } else {
           toast.error("Invalid data structure returned from the API.");
         }
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      } catch (error) {
+      } catch{
         toast.error("Failed to load deliveries.");
       } finally {
         setLoading(false);

@@ -11,7 +11,7 @@ export interface CategoiesData {
 export interface CategoriesDataResponse{
     id: string,
     name: string,
-    parentId: null | string,
+    parentId: null,
 }
 export interface CategoryDataResponse {
     id: string,

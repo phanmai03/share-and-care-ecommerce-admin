@@ -174,11 +174,11 @@ const LoginForm = () => {
                             )}
                         </button>
 
-                        <div className="flex justify-center items-center space-x-4 px-10">
+                        {/* <div className="flex justify-center items-center space-x-4 px-10">
                             <hr className="w-full h-0.5 bg-gray-900" />
                             <h4>OR</h4>
                             <hr className="w-full h-0.5 bg-gray-900" />
-                        </div>
+                        </div> */}
 
                         {/* Social Login Buttons */}
                         {/* <div className="flex space-x-4 justify-center mt-4"> */}

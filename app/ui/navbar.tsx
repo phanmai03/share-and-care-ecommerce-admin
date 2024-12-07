@@ -4,6 +4,7 @@ import { Menu } from "@headlessui/react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { toast } from "react-toastify";
 import { logoutRequest } from "@/app/api/auth";
+import Image from 'next/image';
 
 interface NavbarProps {
   setShowSidebar: React.Dispatch<React.SetStateAction<boolean>>;
@@ -15,20 +16,20 @@ const Navbar: React.FC<NavbarProps> = ({ setShowSidebar }) => {
   const [userId, setUserId] = useState<string | null>(null);
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
   const [role, setRole] = useState<string | null>(null); // Add role state
-  const accessToken = localStorage.getItem("accessToken");
+  const [accessToken, setAccessToken] = useState<string | null>(null);
 
   useEffect(() => {
-    const id = searchParams.get("userId") || localStorage.getItem("userId");
-    if (id) {
-      setUserId(id);
-    }
-    const storedAvatarUrl = localStorage.getItem("avatarUrl"); // Fetch the avatar URL
-    const storedRole = localStorage.getItem("role"); // Fetch role from localStorage
-    if (storedAvatarUrl) {
-      setAvatarUrl(storedAvatarUrl); // Set avatar URL
-    }
-    if (storedRole) {
-      setRole(storedRole); // Set role state
+    // Ensure this code runs only in the client-side
+    if (typeof window !== "undefined") {
+      const storedAccessToken = localStorage.getItem("accessToken");
+      const storedUserId = searchParams.get("userId") || localStorage.getItem("userId");
+      const storedAvatarUrl = localStorage.getItem("avatarUrl");
+      const storedRole = localStorage.getItem("role");
+
+      if (storedAccessToken) setAccessToken(storedAccessToken);
+      if (storedUserId) setUserId(storedUserId);
+      if (storedAvatarUrl) setAvatarUrl(storedAvatarUrl);
+      if (storedRole) setRole(storedRole);
     }
   }, [searchParams]);
 
@@ -40,13 +41,13 @@ const Navbar: React.FC<NavbarProps> = ({ setShowSidebar }) => {
     try {
       await logoutRequest(userId, accessToken);
       toast.success("Logout successful.");
+      // Remove all sensitive data from localStorage
       localStorage.removeItem("accessToken");
       localStorage.removeItem("refreshToken");
       localStorage.removeItem("userId");
-      localStorage.removeItem("role"); // Remove role from storage
+      localStorage.removeItem("role");
       router.push("/auth/login");
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    } catch (error) {
+    } catch {
       toast.error("An error occurred during logout.");
     }
   };
@@ -74,10 +75,12 @@ const Navbar: React.FC<NavbarProps> = ({ setShowSidebar }) => {
         {/* Profile Dropdown */}
         <Menu as="div" className="relative">
           <Menu.Button className="rounded-full overflow-hidden w-8 h-8 focus:outline-none border-2 border-white flex flex-col items-center">
-            <img
+            <Image
               src={avatarUrl || "/profile.png"}
               alt="User avatar"
               className="w-10 h-10 rounded-full object-cover"
+              width={40}
+              height={40}
             />
             {role && <p className="text-xs text-gray-200 mt-1">{role}</p>} {/* Display role */}
           </Menu.Button>

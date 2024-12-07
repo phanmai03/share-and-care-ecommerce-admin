@@ -124,7 +124,7 @@ const Page = () => {
 
   return (
     <div className="min-h-screen p-6">
-      <Heading title="Add Product" />
+      <Heading title="Edit Product" />
       <div className="flex justify-center items-center mt-6">
         {loading ? (
           <div>Loading...</div>

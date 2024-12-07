@@ -32,31 +32,43 @@ const CreateCoupon = () => {
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
   ) => {
     const { name, value } = e.target;
+  
+    if (
+      ["value", "minValue", "maxValue", "maxUses", "maxUsesPerUser"].includes(name) &&
+      Number(value) < 0
+    ) {
+      toast.error(`${name} cannot be negative.`);
+      return; // Ngăn không cập nhật giá trị
+    }
+  
     setFormData((prevData) => ({
       ...prevData,
-      [name]:
-        name === "value" ||
-        name === "minValue" ||
-        name === "maxValue" ||
-        name === "maxUses" ||
-        name === "maxUsesPerUser"
-          ? Number(value)
-          : value,
+      [name]: value,
     }));
   };
+  
   
   // Handle form submission
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+  
+    // Kiểm tra giá trị âm
+    const negativeFields = ["value", "minValue", "maxValue", "maxUses", "maxUsesPerUser"];
+    for (const field of negativeFields) {
+      if (Number(formData[field as keyof Coupon.CouponData]) < 0) {
+        toast.error(`${field} cannot be negative.`);
+        return; // Ngăn không gửi biểu mẫu
+      }
+    }
+  
     try {
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const response = await createCoupon(formData, userId, accessToken);
       toast.success("Coupon created successfully!");
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
       toast.error("Failed to create coupon.");
     }
   };
+  
 
   return (
     <div className="container mx-auto p-8">
@@ -224,7 +236,7 @@ const CreateCoupon = () => {
         <div>
           <button
             type="submit"
-            className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+            className="px-4 py-2 bg-[#38A59F] hover:bg-[#2F8F8A] text-white rounded"
           >
             Create Coupon
           </button>

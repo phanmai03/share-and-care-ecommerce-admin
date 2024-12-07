@@ -93,13 +93,14 @@ const ProductList: React.FC = () => {
               {/* Display additional attributes */}
               <p className="text-sm text-gray-600">Rating: {product.rating}</p>
               <p className="text-sm text-gray-600">Views: {product.views}</p>
-              {product.uniqueViews.length > 0 ? (
-                <p className="text-sm text-gray-600">Unique Views: {product.uniqueViews.length}</p>
+              {product.uniqueViews ? (
+                <p className="text-sm text-gray-600">Unique Views: {product.uniqueViews}</p>
               ) : (
                 <p className="text-sm text-gray-600">Unique Views: 0</p>
               )}
               <p className="text-sm text-gray-600">Slug: {product.slug}</p>
 
+<p className="text-sm text-gray-600">Status: {product.status}</p>
               {/* Variants display */}
               <div className="mt-2">
                 <h3 className="text-sm font-semibold text-gray-700">Variants:</h3>

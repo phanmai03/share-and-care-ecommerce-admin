@@ -50,7 +50,7 @@ export default function Page() {
             height={100}
             className="mx-auto"
           />
-          <h2 className="text-2xl font-semibold text-gray-800 mt-4">Reset Password</h2>
+          <h2 className="text-2xl font-semibold text-gray-800 mt-4">New Password</h2>
           <p className="text-sm text-gray-500 mt-2">
             Enter a new password for your account below.
           </p>
@@ -84,7 +84,7 @@ export default function Page() {
             disabled={loading}
           >
             {loading && <FaSpinner className="mr-2 animate-spin" />}
-            {loading ? "Resetting Password..." : "Reset Password"}
+            {loading ? "Confirm Password..." : "Confirm Password"}
           </button>
         </form>
       </div>
