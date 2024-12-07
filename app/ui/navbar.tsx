@@ -45,13 +45,14 @@ const Navbar: React.FC<NavbarProps> = ({ setShowSidebar }) => {
       localStorage.removeItem("userId");
       localStorage.removeItem("role"); // Remove role from storage
       router.push("/auth/login");
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
       toast.error("An error occurred during logout.");
     }
   };
 
   const handleProfileClick = () => {
-    router.push("/profile");
+    router.push("/auth/profile");
   };
 
   const handlePassword = () => {

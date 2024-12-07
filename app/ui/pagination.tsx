@@ -1,74 +1,61 @@
-import React from 'react';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
+import React from "react";
 
 interface PaginationProps {
-    currentPage: number;
-    totalItems: number;
-    itemsPerPage: number;
-    onPageChange: (page: number) => void;
+  currentPage: number;
+  pageSize: number;
+  totalItems: number;
+  onPageChange: (page: number) => void;
+  onPageSizeChange: (size: number) => void;
 }
 
 const Pagination: React.FC<PaginationProps> = ({
-    currentPage,
-    totalItems,
-    itemsPerPage,
-    onPageChange,
+  currentPage,
+  pageSize,
+  totalItems,
+  onPageChange,
+  onPageSizeChange,
 }) => {
-    const totalPages = Math.ceil(totalItems / itemsPerPage);
+  const totalPages = Math.ceil(totalItems / pageSize);
 
-    const handleNextPage = () => {
-        if (currentPage < totalPages) onPageChange(currentPage + 1);
-    };
-
-    const handlePreviousPage = () => {
-        if (currentPage > 1) onPageChange(currentPage - 1);
-    };
-
-    return (
-        <div className="flex items-center justify-between mt-4">
-            {/* Page information */}
-            <span className="text-gray-700 text-lg">
-                {`${(currentPage - 1) * itemsPerPage + 1}-${Math.min(
-                    currentPage * itemsPerPage,
-                    totalItems
-                )} of ${totalItems}`}
-            </span>
-
-            {/* Pagination buttons */}
-            <div className="flex items-center space-x-2">
-                {/* Previous Page */}
-                <button
-                    onClick={handlePreviousPage}
-                    className={`px-4 py-2 rounded-md ${
-                        currentPage === 1
-                            ? 'text-gray-300 cursor-not-allowed'
-                            : 'text-gray-800 hover:text-black hover:bg-gray-200'
-                    }`}
-                    disabled={currentPage === 1}
-                >
-                    <ChevronLeft className="w-6 h-6" />
-                </button>
-
-                {/* Page number */}
-                <span className="text-lg text-gray-800">
-                    Page {currentPage} of {totalPages}
-                </span>
-
-                {/* Next Page */}
-                <button
-                    onClick={handleNextPage}
-                    className={`px-4 py-2 rounded-md ${
-                        currentPage === totalPages
-                            ? 'text-gray-300 cursor-not-allowed'
-                            : 'text-gray-800 hover:text-black hover:bg-gray-200'
-                    }`}
-                    disabled={currentPage === totalPages}
-                >
-                    <ChevronRight className="w-6 h-6" />
-                </button>
-            </div>
-        </div>
-    );
+  return (
+    <div className="flex justify-between items-center">
+      <div>
+        <label>
+          Show:
+          <select
+            value={pageSize}
+            onChange={(e) => onPageSizeChange(Number(e.target.value))}
+            className="ml-2 border rounded p-1"
+          >
+            {[5, 10, 25, 50, 100].map((size) => (
+              <option key={size} value={size}>
+                {size}
+              </option>
+            ))}
+          </select>
+        </label>
+      </div>
+      <div>
+        <button
+          disabled={currentPage === 1}
+          onClick={() => onPageChange(currentPage - 1)}
+          className="p-2 border rounded mr-2"
+        >
+          Previous
+        </button>
+        <span>
+          Page {currentPage} of {totalPages}
+        </span>
+        <button
+          disabled={currentPage === totalPages}
+          onClick={() => onPageChange(currentPage + 1)}
+          className="p-2 border rounded ml-2"
+        >
+          Next
+        </button>
+      </div>
+    </div>
+  );
 };
 
 export default Pagination;

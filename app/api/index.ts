@@ -15,7 +15,7 @@ api.interceptors.response.use(
     },
     function (error) {
         const errorMessage = error.response.data.message
-        console.error(errorMessage)
+        // console.error(errorMessage)
         showToast(errorMessage)
         throw new Error(errorMessage)
     }

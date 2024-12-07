@@ -24,7 +24,7 @@ export interface ProductDataResponse {
     status:string,
     rating: number,
     views: number,
-    uniqueViews: number, 
+    uniqueViews: string[], 
     variants:Array<Variants>,
 }
 

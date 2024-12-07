@@ -20,30 +20,39 @@ export const createProduct = async (data: Product.ProductData, userId: string, a
     const errorMessage = get(error, 'response.data.error.message', '');
 
     if (errorMessage) {
-      console.log('Error Message:', errorMessage); // Log thông báo lỗi chi tiết
       toast.error(errorMessage);
     }
     throw new Error(errorMessage || 'An unknown error occurred.');
   }
 };
 
-export const getAllProduct = async (userId: string, accessToken: string): Promise<Product.ProductResponse> => {
+export const getAllProduct = async (
+  userId: string,
+  accessToken: string,
+  page: number,
+  size: number // Đổi Size thành size
+): Promise<Product.ProductResponse> => {
   try {
-    const response = await api.get(`${PRODUCT_URL}`, {
+    const response = await api.get(PRODUCT_URL, {
       headers: {
-        'x-client-id': userId,
-        'Authorization': accessToken,
+        "x-client-id": userId,
+        Authorization: accessToken,
+      },
+      params: {
+        page, 
+        size, // Truyền tham số phân trang
       },
     });
-    return response.data.metadata; // Check if metadata contains products
+
+    // Trả về metadata để phân trang
+    return response.data.metadata;
   } catch (error) {
-    const errorMessage = get(error, 'response.data.error.message', '');
+    const errorMessage = get(error, "response.data.error.message", "");
 
     if (errorMessage) {
-      console.log('Error Message:', errorMessage);
       toast.error(errorMessage);
     }
-    throw new Error(errorMessage || 'An unknown error occurred.');
+    throw new Error(errorMessage || "An unknown error occurred.");
   }
 };
 

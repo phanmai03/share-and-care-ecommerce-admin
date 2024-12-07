@@ -161,8 +161,6 @@ const ProductVariants: React.FC<VariantProps> = ({ formData, setFormData }) => {
       variants,
     }));
   }, [groupedCombinations, setFormData]);
-
-  console.log(formData)
   
   return (
     <div>

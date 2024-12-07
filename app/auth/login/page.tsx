@@ -62,7 +62,7 @@ const LoginForm = () => {
 
             // eslint-disable-next-line @typescript-eslint/no-unused-vars
         } catch (error) {
-            toast.error("Login failed. Please try again.");
+            // toast.error("Login failed. Please try again.");
         } finally {
             setLoading(false); // Stop loading
         }
@@ -72,10 +72,6 @@ const LoginForm = () => {
 
     const handleGoogleSignIn = () => {
         alert("Google Sign-In not implemented.");
-    };
-
-    const handleFacebookSignIn = () => {
-        alert("Facebook Sign-In not implemented.");
     };
 
     return (
@@ -195,14 +191,6 @@ const LoginForm = () => {
                                 <FaGoogle className="text-white text-2xl" />
                             </button>
 
-                            {/* Facebook Login */}
-                            <button
-                                type="button"
-                                onClick={handleFacebookSignIn}
-                                className="w-12 h-12 flex items-center justify-center rounded-full bg-[#1877F2] hover:bg-[#165eae] transition focus:outline-none focus:ring-2 focus:ring-blue-400"
-                            >
-                                <FaFacebook className="text-white text-2xl" />
-                            </button>
                         </div>
                     </form>
                 </div>

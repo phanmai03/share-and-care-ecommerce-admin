@@ -17,7 +17,6 @@ export default function Attributes() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    console.log('Form data:', formData);
     // Add logic to handle form submission
   };
 

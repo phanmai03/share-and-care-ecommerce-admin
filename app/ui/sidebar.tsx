@@ -15,6 +15,8 @@ import {
   HousePlus,
   Settings,
   ListTodo,
+  Truck,
+  ShoppingBag
 } from "lucide-react";
 
 // Type the props for Sidebar component
@@ -32,11 +34,13 @@ const Sidebar: React.FC<SidebarProps> = ({ showSidebar, setShowSidebar }) => {
     { title: "Add Product", icon: HousePlus, href: "/dashboard/add-product" },
     { title: "All Product", icon: ShoppingBasket, href: "/dashboard/all-product" },
     // { title: "Email", icon: Mail, href: "/dashboard/email" },
-    // { title: "Discount", icon: TicketPercent, href: "/dashboard/discount" },
+    { title: "Coupon", icon: TicketPercent, href: "/dashboard/coupon" },
     // { title: "Feedback", icon: MessagesSquare, href: "/dashboard/feedback" },
     // { title: "Blog", icon: ListTodo, href: "/dashboard/blog" },
     // { title: "Seller", icon: UserSquare2, href: "/dashboard/seller" },
     { title: "User", icon: Users2, href: "/dashboard/user" },
+    { title: "Delivery", icon: Truck, href: "/dashboard/delivery" },
+    { title: "Orders", icon: ShoppingBag, href: "/dashboard/orders" },
     // { title: "Return Policy", icon: Settings, href: "/dashboard/return-policy" },
   ];
 

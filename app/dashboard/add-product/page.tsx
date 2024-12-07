@@ -42,7 +42,6 @@ const Page = () => {
       toast.error("Missing authentication information. Please log in again.");
       return;
     }
-    console.log(formData)
 
     try {
 
@@ -62,8 +61,6 @@ const Page = () => {
   const handleToggleVariants = () => {
     setIsAddingVariants(!isAddingVariants);
   };
-
-  console.log(formData)
 
   return (
     <div className="min-h-screen p-6">

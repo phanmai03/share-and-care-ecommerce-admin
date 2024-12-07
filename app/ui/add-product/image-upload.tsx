@@ -28,7 +28,6 @@ const ImageUpload: React.FC<ImageUploadProps> = ({ userId, accessToken, formData
     try {
       // Call the upload function and get the image URL
       const uploadedImageUrl = await uploadProductImage({ file }, userId, accessToken);
-      console.log("Uploaded Image URL:", uploadedImageUrl);
 
       // Save the URL in formData.mainImage
       setFormData((prev) => ({

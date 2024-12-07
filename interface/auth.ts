@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 export interface SignUpData {
     email: string;
     username: string;
@@ -48,6 +49,7 @@ export interface UploadAvatar{
 }
 
 export interface UploadAvatarResponse{
+    image_url: any;
     metadata: string;  
 }
 

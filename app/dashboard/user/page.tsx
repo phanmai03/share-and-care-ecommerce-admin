@@ -28,9 +28,13 @@ const UserList: React.FC = () => {
 
       try {
         const response = await getAllUser(userId, accessToken);
-        setUsers(response.users);
+        if (response && response.users) {
+          setUsers(response.users);
+        } else {
+          toast.error("No users data found in the response.");
+        }
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       } catch (error) {
-        console.error("Failed to fetch users:", error);
         toast.error("Failed to load users.");
       } finally {
         setLoading(false);
@@ -59,7 +63,7 @@ const UserList: React.FC = () => {
         <table className="min-w-full table-auto text-lg">
           <thead className="bg-teal-500 text-white">
             <tr>
-              <th className="px-6 py-4 text-left">#</th> {/* Changed from ID to # */}
+              <th className="px-6 py-4 text-left">#</th>
               <th className="px-6 py-4 text-left">Name</th>
               <th className="px-6 py-4 text-left">Email</th>
               <th className="px-6 py-4 text-left">Status</th>
@@ -67,21 +71,28 @@ const UserList: React.FC = () => {
             </tr>
           </thead>
           <tbody>
-            {users.map((user, index) => (
-              <tr
-                key={user.id}
-                className={`${
-                  index % 2 === 0 ? "bg-gray-100" : "bg-white"
-                } hover:bg-gray-200 transition duration-200`}
-              >
-                <td className="px-6 py-4">{index + 1}</td> {/* Display sequential number */}
-                <td className="px-6 py-4">{user.name}</td>
-                <td className="px-6 py-4">{user.email}</td>
-                <td className="px-6 py-4">{user.status}</td>
-                <td className="px-6 py-4">{user.role.name}</td>
+            {users.length > 0 ? (
+              users.map((user, index) => (
+                <tr
+                  key={user.id}
+                  className={`${index % 2 === 0 ? "bg-gray-100" : "bg-white"} hover:bg-gray-200 transition duration-200`}
+                >
+                  <td className="px-6 py-4">{index + 1}</td>
+                  <td className="px-6 py-4">{user.name}</td>
+                  <td className="px-6 py-4">{user.email}</td>
+                  <td className="px-6 py-4">{user.status}</td>
+                  <td className="px-6 py-4">{user.role.name}</td>
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td colSpan={5} className="px-6 py-4 text-center">
+                  No users found.
+                </td>
               </tr>
-            ))}
+            )}
           </tbody>
+
         </table>
       </div>
     </div>
