@@ -25,43 +25,16 @@ const Page = () => {
   });
 
   const [isAddingVariants, setIsAddingVariants] = useState<boolean>(false);
-<<<<<<< Updated upstream
   const accessToken = localStorage.getItem('accessToken');
   const userId = localStorage.getItem('userId')
-=======
-  const accessToken = sessionStorage.getItem("accessToken");
-  const clientId = process.env.NEXT_PUBLIC_ADMIN_ID;
 
-  const handleChange = (key: string, value: unknown) => {
-    setFormData((prev) => ({
-      ...prev,
-      [key]: value,
-    }));
-  }
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
 
-    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-      e.preventDefault();
->>>>>>> Stashed changes
-
-      if (!clientId || !accessToken) {
-        toast.error("Missing authentication information. Please log in again.");
-        return;
-      }
-      try {
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        const response: ProductDetailResponse = await createProduct(
-          { ...formData },
-          clientId,
-          accessToken
-        );
-
-<<<<<<< Updated upstream
     if (!userId || !accessToken) {
       toast.error("Missing authentication information. Please log in again.");
       return;
     }
-<<<<<<< Updated upstream
-=======
 
     // Define the required string fields
     const requiredStringFields: (keyof ProductData)[] = [
@@ -87,7 +60,6 @@ const Page = () => {
         return;
       }
     }
->>>>>>> Stashed changes
 
     try {
       await createProduct(
@@ -95,19 +67,13 @@ const Page = () => {
         userId,
         accessToken
       );
-=======
-        toast.success("Product added successfully!");
-      } catch (error) {
-        toast.error(`Error creating product: ${error}`);
-      }
-    };
->>>>>>> Stashed changes
 
-    const handleToggleVariants = () => {
-      setIsAddingVariants(!isAddingVariants);
-    };
+      toast.success("Product added successfully!");
+    } catch (error) {
+      toast.error(`Error creating product: ${error}`);
+    }
+  };
 
-<<<<<<< Updated upstream
   const handleToggleVariants = () => {
     setIsAddingVariants(!isAddingVariants);
   };
@@ -145,53 +111,21 @@ const Page = () => {
                 {isAddingVariants ? "Cancel Add Variants" : "Add Variants"}
               </button>
             </div>
-=======
-    console.log(formData)
 
-    return (
-      <div className="min-h-screen p-6">
-        <Heading title="Add Product" />
-        <div className="flex justify-center items-center mt-6">
-          <div className="bg-white max-w-4xl w-full p-6 rounded-lg shadow-lg">
-            <form onSubmit={handleSubmit} className="space-y-6">
-              {/* Product Details */}
-              <Detail formData={formData} setFormData={setFormData} />
-              {/* Product Images */}
-              <Images formData={formData} setFormData={setFormData} onChange={handleChange} />
-
-              {/* Conditionally Render Properties or Variants */}
-              {isAddingVariants ? (
-                <ProductVariants formData={formData} setFormData={setFormData} />
-              ) : (
-                <Property formData={formData} setFormData={setFormData} />
-              )}
-
-              {/* Toggle to show properties or variants */}
-              <div className="flex justify-between items-center mb-6">
-                <button
-                  type="button"
-                  onClick={handleToggleVariants}
-                  className="px-4 py-2 text-sm border border-dashed border-gray-300 rounded-md text-gray-500 hover:border-gray-400"
-                >
-                  {isAddingVariants ? "Cancel Adding Variants" : "Add Variants"}
-                </button>
-              </div>
->>>>>>> Stashed changes
-
-              {/* Submit Button */}
-              <div className="flex justify-between items-center mt-6">
-                <button
-                  type="submit"
-                  className="px-6 py-2 bg-[#38A59F] text-white rounded-lg shadow hover:bg-[#2F8F8A] transition"
-                >
-                  Add Product
-                </button>
-              </div>
-            </form>
-          </div>
+            {/* Submit Button */}
+            <div className="flex justify-between items-center mt-6">
+              <button
+                type="submit"
+                className="px-6 py-2 bg-[#38A59F] text-white rounded-lg shadow hover:bg-[#2F8F8A] transition"
+              >
+                Add Product
+              </button>
+            </div>
+          </form>
         </div>
       </div>
-    );
-  };
+    </div>
+  );
+};
 
-  export default Page;
+export default Page;

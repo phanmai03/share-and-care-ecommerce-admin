@@ -4,7 +4,6 @@ import { ProductData, Variants, SkuList } from "@/interface/product";
 import { toast } from "react-toastify";
 import { uploadProductImage } from "@/app/api/upload";
 
-<<<<<<< Updated upstream
 interface VariantProps {
   setFormData: React.Dispatch<React.SetStateAction<ProductData>>;
 }
@@ -22,26 +21,6 @@ const ProductVariants: React.FC<VariantProps> = ({ setFormData }) => {
       options: [""],
     },
   ];
-=======
-import { ProductData } from "@/interface/product";
-import React, { useState, useCallback, useMemo } from "react";
-
-interface VariantProps {
-  formData: ProductData;
-  setFormData: React.Dispatch<React.SetStateAction<ProductData>>;
-}
-
-interface VariantGroup {
-  id: number;
-  name: string;
-  options: Array<{ value: string; image: string | null }>;
-}
-
-const ProductVariants: React.FC<VariantProps> = ({ formData, setFormData }) => {
-  const [variantGroups, setVariantGroups] = useState<VariantGroup[]>([
-    { id: 1, name: "", options: [] },
-  ]);
->>>>>>> Stashed changes
 
   const userId = localStorage.getItem('userId');
   const accessToken = localStorage.getItem('accessToken');
@@ -59,7 +38,6 @@ const ProductVariants: React.FC<VariantProps> = ({ formData, setFormData }) => {
   const addOption = (index: number) => {
     const lastOption = variants[index].options[variants[index].options.length - 1];
 
-<<<<<<< Updated upstream
     if (lastOption.trim() === "") {
       toast.error("Cannot add option. Please fill the last option first.");
       return;
@@ -67,102 +45,6 @@ const ProductVariants: React.FC<VariantProps> = ({ formData, setFormData }) => {
 
     const newVariants = [...variants];
     newVariants[index].options.push("");
-=======
-  const addOptionToGroup = (groupId: number) => {
-    setVariantGroups((prev) =>
-      prev.map((group) =>
-        group.id === groupId
-          ? { ...group, options: [...group.options, { value: "", image: null }] }
-          : group
-      )
-    );
-  };
-
-  const updateOption = (
-    groupId: number,
-    optionIndex: number,
-    value: string
-  ) => {
-    setVariantGroups((prev) =>
-      prev.map((group) =>
-        group.id === groupId
-          ? {
-            ...group,
-            options: group.options.map((opt, idx) =>
-              idx === optionIndex ? { ...opt, value } : opt
-            ),
-          }
-          : group
-      )
-    );
-  };
-
-  const updateOptionImage = (
-    groupId: number,
-    optionIndex: number,
-    image: string
-  ) => {
-    setVariantGroups((prev) =>
-      prev.map((group) =>
-        group.id === groupId
-          ? {
-            ...group,
-            options: group.options.map((opt, idx) =>
-              idx === optionIndex ? { ...opt, image } : opt
-            ),
-          }
-          : group
-      )
-    );
-  };
-
-  const removeOption = (groupId: number, optionIndex: number) => {
-    setVariantGroups((prev) =>
-      prev.map((group) =>
-        group.id === groupId
-          ? {
-            ...group,
-            options: group.options.filter((_, idx) => idx !== optionIndex),
-          }
-          : group
-      )
-    );
-  };
-
-  const removeVariantGroup = (id: number) => {
-    setVariantGroups((prev) => prev.filter((group) => group.id !== id));
-  };
-
-  const generateGroupedCombinations = useCallback(() => {
-    const groupMap = variantGroups.reduce((acc, group) => {
-      if (group.name.trim() && group.options.some((opt) => opt.value.trim())) {
-        acc[group.name] = group.options.filter((opt) => opt.value.trim());
-      }
-      return acc;
-    }, {} as Record<string, { value: string; image: string | null }[]>);
-
-    if (!groupMap["Màu sắc"] && !groupMap["Kích cỡ"]) return [];
-
-    const primaryGroup = groupMap["Màu sắc"] || [];
-    const secondaryGroup = groupMap["Kích cỡ"] || [];
-
-    if (primaryGroup.length === 0) {
-      return secondaryGroup.map((secondaryOption) => ({
-        primaryOption: null,
-        secondaryOption,
-      }));
-    }
-
-    return primaryGroup.flatMap((primaryOption) =>
-      secondaryGroup.length > 0
-        ? secondaryGroup.map((secondaryOption) => ({
-          primaryOption,
-          secondaryOption,
-        }))
-        : [{ primaryOption, secondaryOption: null }]
-    );
-  }, [variantGroups]);
->>>>>>> Stashed changes
 
     // Update the variant combinations and SKU list
     const colorOptions = newVariants[0].options.filter(option => option.trim() !== "");
@@ -272,24 +154,6 @@ const ProductVariants: React.FC<VariantProps> = ({ formData, setFormData }) => {
     setSkuList(newSkuList);
   };
 
-  // Update formData with current variants
-  React.useEffect(() => {
-    const variants = groupedCombinations.map((group) => ({
-      color: group.color,
-      image: group.image,
-      sizes: group.sizes,
-    }));
-
-    setFormData((prevData) => ({
-      ...prevData,
-      variants,
-    }));
-  }, [groupedCombinations, setFormData]);
-<<<<<<< Updated upstream
-  
-=======
-
->>>>>>> Stashed changes
   return (
     <div className="max-w-4xl mx-auto p-6 space-y-4">
       <h2 className="text-lg font-semibold">Product Variants</h2>

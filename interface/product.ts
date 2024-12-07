@@ -28,21 +28,6 @@ export interface ProductDataEdit {
 }
 
 export interface ProductDataResponse {
-<<<<<<< Updated upstream
-    id: string,
-    name: string,
-    slug:string, 
-    mainImage: string, 
-    price: number,
-    originalPrice: number,
-    quantity: number,
-    sold: number,
-    status:string,
-    rating: number,
-    views: number,
-    uniqueViews: string[], 
-    variants:Array<Variants>,
-=======
   id: string,
   name: string,
   slug: string,
@@ -56,7 +41,6 @@ export interface ProductDataResponse {
   views: number,
   uniqueViews: number,
   variants: Array<Variants>,
->>>>>>> Stashed changes
 }
 
 export interface ProductDetailResponse {
