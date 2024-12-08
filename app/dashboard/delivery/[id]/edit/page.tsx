@@ -31,7 +31,7 @@ const DeliveryDetail = () => {
           const data = await getDeliveryDetail(deliveryId, userId, accessToken);
           // console.log("API response for delivery detail: ", data); // Debug log
           setDeliveryData(data);
-        } catch (err) {
+        } catch{
           // console.error("Failed to fetch delivery data:", err);
           setError("Failed to load delivery data. Please try again.");
         } finally {
@@ -56,7 +56,7 @@ const DeliveryDetail = () => {
       await (action === 'activate' ? updateActive(deliveryId, userId, accessToken) : updateDeactivate(deliveryId, userId, accessToken));
 
       setDeliveryData(prevData => prevData ? { ...prevData, isActive: !prevData.isActive } : prevData);
-    } catch (err) {
+    } catch{
       // console.error("Failed to update status:", err);
       setError("Failed to update delivery status. Please try again.");
     } finally {
@@ -81,7 +81,7 @@ const DeliveryDetail = () => {
 
       setDeliveryData(updatedData);
       setIsEditing(false);
-    } catch (err) {
+    } catch{
       // console.error("Failed to update delivery data:", err);
       setError("Failed to update delivery information. Please try again.");
     } finally {

@@ -125,7 +125,7 @@ const ProductVariants: React.FC<VariantProps> = ({ setFormData }) => {
 
         toast.success("Image uploaded successfully!");
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      } catch (error) {
+      } catch {
         toast.error("Failed to upload image.");
       }
     }

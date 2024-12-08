@@ -21,7 +21,7 @@ const DeliveryDetail = () => {
         try {
           const data = await getDeliveryDetail(deliveryId, userId, accessToken);
           setDeliveryData(data);
-        } catch (err) {
+        } catch{
           // console.error("Failed to fetch delivery data:", err);
           setError("Failed to load delivery data. Please try again.");
         } finally {

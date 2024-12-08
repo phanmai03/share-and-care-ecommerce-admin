@@ -32,7 +32,7 @@ export default function Page() {
       toast.success("Your password has been updated successfully. Please log in again.");
       router.push("/auth/login");
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    } catch (error) {
+    } catch {
       toast.error("Failed to reset password. Please try again.");
     } finally {
       setLoading(false);

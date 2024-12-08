@@ -1,11 +1,12 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { useParams, useRouter } from "next/navigation";
+import { useParams} from "next/navigation";
 import { toast } from "react-toastify";
 import { getOrderDetail, updateOrderStatus } from "@/app/api/order"; // Correct API imports
 import { OrderMetadata } from "@/interface/order"; // Correct type import
 import BackButton from "@/app/ui/back-button"; // Import BackButton component
+import Image from "next/image";
 
 const OrderDetailPage: React.FC = () => {
   const { id } = useParams(); // Get orderId from the URL
@@ -18,7 +19,6 @@ const OrderDetailPage: React.FC = () => {
   const accessToken = typeof window !== "undefined" ? localStorage.getItem("accessToken") || "" : "";
 
   // Get previous pathname from the router
-  const router = useRouter();
 
   // Check if orderId is a valid string
   const orderId = Array.isArray(id) ? id[0] : id;
@@ -33,7 +33,7 @@ const OrderDetailPage: React.FC = () => {
       } else {
         toast.error("Missing authentication information.");
       }
-    } catch (error) {
+    } catch{
       // console.error("Error fetching order details:", error);
       toast.error("Error fetching order details.");
     } finally {
@@ -54,7 +54,7 @@ const OrderDetailPage: React.FC = () => {
       await updateOrderStatus(orderId, userId, accessToken); // Update status
       toast.success("Order status updated successfully!");
       fetchOrder(); // Re-fetch the order after updating status
-    } catch (error) {
+    } catch {
       toast.error("Error updating order status.");
     } finally {
       setUpdatingStatus(false);
@@ -100,7 +100,7 @@ const OrderDetailPage: React.FC = () => {
             <h3 className="text-lg font-semibold">Items</h3>
             {order.items.map((item, index) => (
               <div key={index} className="flex items-center mb-4 space-x-4">
-                <img
+                <Image
                   src={item.image}
                   alt={item.productName}
                   className="w-16 h-16 object-cover rounded-lg"

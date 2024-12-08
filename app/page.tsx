@@ -1,10 +1,13 @@
 'use client'
 
-import LoginForm from "./auth/login/page";
+// import LoginForm from "./auth/login/page";
 
-// import dynamic from "next/dynamic";
+import dynamic from "next/dynamic";
 
-// const LoginForm = dynamic(() => import('./ui/auth/login-form'), { ssr: false })
+const LoginForm = dynamic(
+  () => import('./auth/login/page'), 
+  { ssr: false }
+)
 
 export default function Home() {
   return (

@@ -2,11 +2,10 @@
 
 import React, { useState } from "react";
 import Image from "next/image";
-// import { FaGoogle, FaFacebook } from "react-icons/fa";
 import { useRouter } from "next/navigation";
 import { Mail, Lock } from "lucide-react";
 import { toast } from "react-toastify";
-import { checkAdmin, loginRequest, } from "@/app/api/auth";
+import { checkAdmin, loginRequest } from "@/app/api/auth";
 import { useAuth } from "@/app/context/AuthContext";
 
 const LoginForm = () => {
@@ -15,10 +14,13 @@ const LoginForm = () => {
         password: "",
     });
     const router = useRouter();
-    // const { deviceToken, deviceName, browserName } = useDeviceInfo();
     const { setIsLogin } = useAuth();
     const [loading, setLoading] = useState(false);
-    const [accessAdmin, setaccessAdmin] = useState({});
+
+    /* eslint-disable @typescript-eslint/no-unused-vars */
+const userId = typeof window !== "undefined" ? localStorage.getItem("userId") || "" : "";
+const accessToken = typeof window !== "undefined" ? localStorage.getItem("accessToken") || "" : "";
+/* eslint-enable @typescript-eslint/no-unused-vars */
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
@@ -33,10 +35,9 @@ const LoginForm = () => {
             const response = await loginRequest({
                 email: formData.email,
                 password: formData.password,
-                // deviceToken: deviceToken,
-                // deviceName: deviceName,
             });
 
+            // Store tokens and user data in localStorage
             localStorage.setItem("accessToken", response.tokens.accessToken);
             localStorage.setItem("refreshToken", response.tokens.refreshToken);
             localStorage.setItem("userId", response.user.id);
@@ -45,34 +46,24 @@ const LoginForm = () => {
 
             // Check if the user is an admin
             const adminCheck = await checkAdmin(
-                response.user.id,  // Use user.id instead of clientId
+                response.user.id, // Use user.id instead of clientId
                 response.tokens.accessToken
             );
-            setaccessAdmin(adminCheck)
 
-            if (Object.keys(accessAdmin).length === 0) {
+            if (Object.keys(adminCheck).length === 0) {
                 toast.success("Login successful.");
                 // Redirect to admin panel if the user is an admin
-                
                 router.push("/dashboard");
             } else {
                 // Stay on the current page if the user is not an admin
                 toast.info("You are not an admin. Stay here.");
             }
-
-            // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        } catch (error) {
-            // toast.error("Login failed. Please try again.");
+        } catch {
+            toast.error("Login failed. Please try again.");
         } finally {
             setLoading(false); // Stop loading
         }
     };
-
-    localStorage.setItem("isPanel", "true")
-
-    // const handleGoogleSignIn = () => {
-    //     alert("Google Sign-In not implemented.");
-    // };
 
     return (
         <div className="flex items-center justify-center min-h-screen bg-gray-50">
@@ -141,8 +132,7 @@ const LoginForm = () => {
                         {/* Login Button */}
                         <button
                             type="submit"
-                            className={`w-full flex items-center justify-center py-2 px-4 rounded-md font-medium text-white transition ${loading ? "bg-gray-400 cursor-not-allowed" : "bg-[#38A59F] hover:bg-[#2F8F8A]"
-                                }`}
+                            className={`w-full flex items-center justify-center py-2 px-4 rounded-md font-medium text-white transition ${loading ? "bg-gray-400 cursor-not-allowed" : "bg-[#38A59F] hover:bg-[#2F8F8A]"}`}
                             disabled={loading}
                         >
                             {loading ? (
@@ -173,25 +163,6 @@ const LoginForm = () => {
                                 "LOGIN"
                             )}
                         </button>
-
-                        {/* <div className="flex justify-center items-center space-x-4 px-10">
-                            <hr className="w-full h-0.5 bg-gray-900" />
-                            <h4>OR</h4>
-                            <hr className="w-full h-0.5 bg-gray-900" />
-                        </div> */}
-
-                        {/* Social Login Buttons */}
-                        {/* <div className="flex space-x-4 justify-center mt-4"> */}
-                            {/* Google Login */}
-                            {/* <button
-                                type="button"
-                                onClick={handleGoogleSignIn}
-                                className="w-12 h-12 flex items-center justify-center rounded-full bg-[#dc2626] hover:bg-[#b91c1c] transition focus:outline-none focus:ring-2 focus:ring-red-400"
-                            > */}
-                                {/* <FaGoogle className="text-white text-2xl" />
-                            </button>
-
-                        </div> */}
                     </form>
                 </div>
             </div>

@@ -31,7 +31,7 @@ const PublishProduct: React.FC<PublishProductProps> = ({ id, status }) => {
         }
         setEnabled(!enabled);
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      } catch (error) {
+      } catch {
         toast.error("Failed to toggle product status.");
       }
     }

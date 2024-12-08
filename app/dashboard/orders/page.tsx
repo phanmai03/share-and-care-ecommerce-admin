@@ -5,7 +5,6 @@ import { getAllOrder } from "@/app/api/order";
 import { Order, OrderResponse } from "@/interface/order";
 import { toast } from "react-toastify";
 import Pagination from "@/app/ui/pagination";
-import { FaEdit } from "react-icons/fa";
 import { GrFormView } from "react-icons/gr";
 import { useRouter } from "next/navigation";
 
@@ -45,7 +44,7 @@ const OrderList: React.FC = () => {
       setError(null);
     } catch (err) {
       setError("Failed to fetch orders. Please try again later.");
-      // console.error("Error:", err);
+      console.error("Error:", err);
       toast.error("Error fetching orders.");
     } finally {
       setLoading(false);

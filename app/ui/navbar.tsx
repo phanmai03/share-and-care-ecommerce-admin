@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { AlignJustify } from "lucide-react";
 import { Menu } from "@headlessui/react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
 import { logoutRequest } from "@/app/api/auth";
 import Image from "next/image";
@@ -12,7 +12,6 @@ interface NavbarProps {
 
 const Navbar: React.FC<NavbarProps> = ({ setShowSidebar }) => {
   const router = useRouter();
-  const searchParams = useSearchParams();
   const [userId, setUserId] = useState<string | null>(null);
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
   const [role, setRole] = useState<string | null>(null);
@@ -21,11 +20,11 @@ const Navbar: React.FC<NavbarProps> = ({ setShowSidebar }) => {
   useEffect(() => {
     if (typeof window !== "undefined") {
       setAccessToken(localStorage.getItem("accessToken"));
-      setUserId(searchParams?.get("userId") || localStorage.getItem("userId"));
+      setUserId(localStorage.getItem("userId"));
       setAvatarUrl(localStorage.getItem("avatarUrl"));
       setRole(localStorage.getItem("role"));
     }
-  }, [searchParams]);
+  }, []);
 
   const handleLogout = async () => {
     if (!accessToken || !userId) {

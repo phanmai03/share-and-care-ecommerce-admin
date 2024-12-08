@@ -51,7 +51,7 @@ const accessToken = typeof window !== "undefined" ? localStorage.getItem("access
 
         toast.success("Image uploaded successfully!");
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      } catch (error) {
+      } catch  {
         toast.error("Failed to upload image.");
       } finally {
         setLoadingMainImage(false);

@@ -8,10 +8,14 @@ interface AuthContextType {
     checkAccessToken: () => boolean;
 }
 
+
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     const [isLogin, setIsLogin] = useState<boolean>(false);
+
+    // const userId = typeof window !== "undefined" ? localStorage.getItem("userId") || "" : "";
+    // const accessToken = typeof window !== "undefined" ? localStorage.getItem("accessToken") || "" : "";
 
     const checkAccessToken = () => {
         const token = localStorage.getItem('accessToken');

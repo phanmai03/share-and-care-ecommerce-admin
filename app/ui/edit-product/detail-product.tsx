@@ -29,7 +29,7 @@ const CreateProductForm: React.FC<ProductFormProps> = ({ formData, setFormData }
         const childDataObject = childDataArray.reduce((acc, curr) => ({ ...acc, ...curr }), {});
         setChildCategories(childDataObject);
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      } catch (error) {
+      } catch {
         toast.error("Failed to load categories.");
       } finally {
         setIsLoading(false);

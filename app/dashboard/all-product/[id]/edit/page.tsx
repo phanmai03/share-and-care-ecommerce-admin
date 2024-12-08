@@ -72,7 +72,7 @@ const Page = () => {
             variants: response.product.variants || [],
             skuList: response.skuList ? transformSkuList(response.skuList.skuList) : [],
           });
-        } catch (error) {
+        } catch {
           // console.error("Error fetching products:", error);
         } finally {
           setLoading(false);

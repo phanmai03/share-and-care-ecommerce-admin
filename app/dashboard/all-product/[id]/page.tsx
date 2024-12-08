@@ -6,6 +6,7 @@ import { toast } from "react-toastify";
 import { ProductDataDetailResponse } from "@/interface/product"; // Import necessary types
 import BackButton from "@/app/ui/back-button"; // Import the BackButton component
 
+
 const ProductDetailPage = () => {
   const { id } = useParams(); // Get the product ID from the URL
   const [product, setProduct] = useState<ProductDataDetailResponse | null>(null);
@@ -30,7 +31,7 @@ const ProductDetailPage = () => {
         } else {
           toast.error("Missing authentication information.");
         }
-      } catch (error) {
+      } catch {
         // console.error("Error fetching product details:", error);
         toast.error("Error fetching product details.");
       } finally {
