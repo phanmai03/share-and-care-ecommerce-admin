@@ -50,7 +50,7 @@ export default function Page() {
           />
           <h2 className="text-2xl font-semibold text-gray-800 mt-4">Update Password?</h2>
           <p className="text-sm text-gray-500 mt-2">
-            Enter your registered email address and we’ll send you a reset link.
+            {/* Enter your registered email address and we’ll send you a reset link. */}
           </p>
         </div>
 

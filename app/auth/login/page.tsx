@@ -18,9 +18,9 @@ const LoginForm = () => {
     const [loading, setLoading] = useState(false);
 
     /* eslint-disable @typescript-eslint/no-unused-vars */
-const userId = typeof window !== "undefined" ? localStorage.getItem("userId") || "" : "";
-const accessToken = typeof window !== "undefined" ? localStorage.getItem("accessToken") || "" : "";
-/* eslint-enable @typescript-eslint/no-unused-vars */
+    const userId = typeof window !== "undefined" ? localStorage.getItem("userId") || "" : "";
+    const accessToken = typeof window !== "undefined" ? localStorage.getItem("accessToken") || "" : "";
+    /* eslint-enable @typescript-eslint/no-unused-vars */
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
@@ -124,10 +124,11 @@ const accessToken = typeof window !== "undefined" ? localStorage.getItem("access
                                     placeholder="Enter your password"
                                     onChange={handleChange}
                                     required
-                                    autoComplete="current-password"
+                                    autoComplete="current-password" // Autofill enabled for password
                                 />
                             </div>
                         </div>
+
 
                         {/* Login Button */}
                         <button
