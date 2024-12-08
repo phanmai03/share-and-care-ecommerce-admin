@@ -19,8 +19,9 @@ const ProductList: React.FC = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const router = useRouter();
 
-  const accessToken = localStorage.getItem("accessToken");
-  const userId = localStorage.getItem("userId");
+  const userId = typeof window !== "undefined" ? localStorage.getItem("userId") || "" : "";
+  const accessToken = typeof window !== "undefined" ? localStorage.getItem("accessToken") || "" : "";
+
 
   const fetchProducts = async (page: number, size: number) => {
     if (!accessToken || !userId) {
@@ -50,7 +51,7 @@ const ProductList: React.FC = () => {
 
   useEffect(() => {
     fetchProducts(currentPage, pageSize);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentPage, pageSize]);
 
   const handlePageChange = (page: number) => setCurrentPage(page);
@@ -100,7 +101,7 @@ const ProductList: React.FC = () => {
               )}
               <p className="text-sm text-gray-600">Slug: {product.slug}</p>
 
-<p className="text-sm text-gray-600">Status: {product.status}</p>
+              <p className="text-sm text-gray-600">Status: {product.status}</p>
               {/* Variants display */}
               <div className="mt-2">
                 <h3 className="text-sm font-semibold text-gray-700">Variants:</h3>

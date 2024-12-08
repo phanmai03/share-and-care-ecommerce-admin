@@ -11,7 +11,7 @@ export const getAllOrder = async (
   accessToken: string,
   page: number,
   size: number
-): Promise<Order.OrderRespone> => {
+): Promise<Order.OrderResponse> => {
   try {
     const response = await api.get(`${ORDER_URL}/all`, {
       headers: {
@@ -23,7 +23,7 @@ export const getAllOrder = async (
         size,
       },
     });
-    return response.data.metadata; // Đảm bảo trả về đúng cấu trúc dữ liệu
+    return response.data.metadata;
   } catch (error) {
     const errorMessage = get(error, "response.data.error.message", "");
     if (errorMessage) {
@@ -33,3 +33,40 @@ export const getAllOrder = async (
   }
 };
 
+export const getOrderDetail = async (
+  id: string,
+  userId: string,
+  accessToken: string
+): Promise<Order.OrderMetadata> => {
+  try {
+    const response = await api.get(`${ORDER_URL}/all/${id}`, {
+      headers: {
+        "x-client-id": userId,
+        Authorization: accessToken,
+      },
+    });
+    return response.data.metadata.orders; // Trả về đúng đối tượng
+  } catch (error) {
+    const errorMessage = get(error, "response.data.error.message", "");
+    if (errorMessage) {
+      toast.error(errorMessage);
+    }
+    throw new Error(errorMessage || "An unknown error occurred.");
+  }
+};
+
+export const updateOrderStatus = async (id: string, userId: string, accessToken: string) => {
+  try {
+    const response = await api.patch(`${ORDER_URL}/next-status/${id}`, {}, {
+      headers: {
+        'x-client-id': userId,
+        Authorization: accessToken,
+      },
+    });
+    return response.data.metadata; // Kiểm tra lại dữ liệu trả về
+  } catch (error) {
+    const errorMessage = get(error, 'response.data.error.message', 'An unknown error occurred.');
+    toast.error(errorMessage);
+    throw new Error(errorMessage);
+  }
+};

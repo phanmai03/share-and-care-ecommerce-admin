@@ -133,3 +133,48 @@ export const unPublishProduct = async (id: string, userId: string, accessToken: 
   }
 };
 
+//Đang thực hiện
+export const undateProductView = async (productId: string, deviceId: string, userId: string, accessToken: string) => {
+  try {
+    const response = await api.patch(`${PRODUCT_URL}/update-views`, {productId, deviceId}, {
+      headers: {
+        'x-client-id': userId,
+        'Authorization': accessToken
+      }
+    });
+    return response.data.metadata;
+  } catch (error) {
+    const errorMessage = get(error, 'response.data.error.message', '');
+
+    if (errorMessage) {
+      toast.error(errorMessage);
+    }
+    throw new Error(errorMessage || 'An unknown error occurred.');
+  }
+};
+
+export const importProduct = async (
+  data: { id: string, quantity: number } | { id: string, skuList: { id: string, quantity: number }[] }, 
+  userId: string, 
+  accessToken: string
+) => {
+  try {
+    // Send the appropriate data structure depending on whether it's a single product or a list of SKUs
+    const response = await api.patch(
+      `${PRODUCT_URL}/update-quantity`,
+      data,
+      {
+        headers: {
+          'x-client-id': userId,
+          'Authorization': accessToken
+        }
+      }
+    );
+      return response.data.metadata;; // Indicating successful update
+  } catch (error) {
+    // Detailed error handling
+    const errorMessage = get(error, 'response.data.error.message', 'An unknown error occurred.');
+    toast.error(errorMessage);
+    throw new Error(errorMessage); // Propagate the error for further handling
+  }
+};

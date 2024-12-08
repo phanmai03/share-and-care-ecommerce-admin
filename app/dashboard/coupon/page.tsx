@@ -24,9 +24,9 @@ const CreateCoupon = () => {
     // targetIds: [], // Optional target IDs if needed
   });
 
-  const userId = localStorage.getItem("userId") || ""; // Replace with a secure method of fetching user ID
-  const accessToken = localStorage.getItem("accessToken") || ""; // Replace with a secure method of fetching access token
-
+  const userId = typeof window !== "undefined" ? localStorage.getItem("userId") || "" : "";
+  const accessToken = typeof window !== "undefined" ? localStorage.getItem("accessToken") || "" : "";
+  
   // Handle form changes
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
@@ -62,12 +62,13 @@ const CreateCoupon = () => {
     }
   
     try {
-      const response = await createCoupon(formData, userId, accessToken);
+      await createCoupon(formData, userId, accessToken); // Directly await and handle success/failure
       toast.success("Coupon created successfully!");
-    } catch (error) {
+    } catch {
       toast.error("Failed to create coupon.");
     }
   };
+  
   
 
   return (

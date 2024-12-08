@@ -10,8 +10,9 @@ import { FaEdit } from "react-icons/fa";
 const DeliveriesCardList: React.FC = () => {
   const [deliveries, setDeliveries] = useState<Delivery.DeliveriesData[]>([]); // Initialize as empty array
   const [loading, setLoading] = useState<boolean>(true);
-  const userId = localStorage.getItem("userId");
-  const accessToken = localStorage.getItem("accessToken");
+  const userId = typeof window !== "undefined" ? localStorage.getItem("userId") || "" : "";
+const accessToken = typeof window !== "undefined" ? localStorage.getItem("accessToken") || "" : "";
+
 
   useEffect(() => {
     const fetchDeliveries = async () => {

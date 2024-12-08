@@ -1,12 +1,13 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { getAllOrder } from "@/app/api/order"; // Đảm bảo đường dẫn đúng
-import { Order, OrderRespone } from "@/interface/order"; // Đảm bảo import đúng
+import { getAllOrder } from "@/app/api/order";
+import { Order, OrderResponse } from "@/interface/order";
 import { toast } from "react-toastify";
-import Pagination from "@/app/ui/pagination"; // Tái sử dụng pagination component
+import Pagination from "@/app/ui/pagination";
 import { FaEdit } from "react-icons/fa";
 import { GrFormView } from "react-icons/gr";
+import { useRouter } from "next/navigation";
 
 const OrderList: React.FC = () => {
   const [orders, setOrders] = useState<Order[]>([]);
@@ -15,26 +16,37 @@ const OrderList: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(true);
   const [pageSize, setPageSize] = useState(5);
   const [currentPage, setCurrentPage] = useState(1);
+  const router = useRouter();
 
-  const accessToken = localStorage.getItem("accessToken");
-  const userId = localStorage.getItem("userId");
+  const [userId, setUserId] = useState<string>("");
+  const [accessToken, setAccessToken] = useState<string>("");
 
+  // Fetch access token and user ID from localStorage
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      setUserId(localStorage.getItem("userId") || "");
+      setAccessToken(localStorage.getItem("accessToken") || "");
+    }
+  }, []);
+
+  // Fetch orders from API
   const fetchOrders = async (page: number, size: number) => {
     if (!accessToken || !userId) {
-      setError("Missing access token or client ID");
+      setError("Missing authentication information");
       setLoading(false);
       return;
     }
 
     try {
       setLoading(true);
-      const response: OrderRespone = await getAllOrder(userId, accessToken, page, size);
-      setOrders(response.orders || []);
+      const response: OrderResponse = await getAllOrder(userId, accessToken, page, size);
+      setOrders(response.orders);
       setTotalOrders(response.totalOrders || 0);
       setError(null);
-    } catch (error) {
-      setError("Failed to fetch orders");
-      toast.error(`Error: ${error}`);
+    } catch (err) {
+      setError("Failed to fetch orders. Please try again later.");
+      // console.error("Error:", err);
+      toast.error("Error fetching orders.");
     } finally {
       setLoading(false);
     }
@@ -42,14 +54,17 @@ const OrderList: React.FC = () => {
 
   useEffect(() => {
     fetchOrders(currentPage, pageSize);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentPage, pageSize]);
+  }, [currentPage, pageSize, accessToken, userId]);
 
+  // Handle pagination and page size changes
   const handlePageChange = (page: number) => setCurrentPage(page);
   const handlePageSizeChange = (size: number) => {
     setPageSize(size);
-    setCurrentPage(1); // Reset về trang đầu tiên khi thay đổi số lượng trên mỗi trang
+    setCurrentPage(1); // Reset to page 1 on page size change
   };
+
+  // Handlers for view and edit actions
+  const handleView = (id: string) => router.push(`orders/${id}`);
 
   if (loading) return <p className="text-center">Loading...</p>;
   if (error) return <p className="text-center text-red-500">{error}</p>;
@@ -61,7 +76,9 @@ const OrderList: React.FC = () => {
         {orders.length > 0 ? (
           orders.map((order, index) => (
             <div key={order.id} className="bg-white border rounded-lg shadow-md p-4">
-              <h2 className="font-semibold text-lg">Order #{(currentPage - 1) * pageSize + index + 1}</h2>
+              <h2 className="font-semibold text-lg">
+                Order #{(currentPage - 1) * pageSize + index + 1}
+              </h2>
               <div className="mt-2">
                 <p className="text-sm text-gray-600">
                   <strong>Customer:</strong> {order.shippingAddress.fullname}
@@ -86,18 +103,21 @@ const OrderList: React.FC = () => {
                 </p>
               </div>
               <div className="mt-4 flex justify-end space-x-2">
-                <button className="bg-blue-800 text-white px-4 py-2 rounded-md"><GrFormView/></button>
-                <button className="bg-teal-500 text-white px-4 py-2 rounded-md"><FaEdit /></button>
+                <button
+                  onClick={() => handleView(order.id)}
+                  className="bg-blue-800 text-white p-2 rounded-md"
+                  aria-label="View Order"
+                >
+                  <GrFormView />
+                </button>
               </div>
             </div>
           ))
         ) : (
-          <div className="text-center text-gray-500 col-span-4">
-            No orders found.
-          </div>
+          <div className="text-center text-gray-500 col-span-4">No orders found.</div>
         )}
       </div>
-      <div className="mt-6">
+      <div className="mt-6 ">
         <Pagination
           currentPage={currentPage}
           pageSize={pageSize}

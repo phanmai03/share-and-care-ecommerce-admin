@@ -19,8 +19,9 @@ export default function Page() {
   >({});
   const [editingCategory, setEditingCategory] = useState<CategoryDataResponse | null>(null);
 
-  const accessToken = localStorage.getItem("accessToken");
-  const userId = localStorage.getItem("userId");
+  const userId = typeof window !== "undefined" ? localStorage.getItem("userId") || "" : "";
+  const accessToken = typeof window !== "undefined" ? localStorage.getItem("accessToken") || "" : "";
+  
 
   // Fetch all categories
   const fetchCategories = async () => {
@@ -28,7 +29,7 @@ export default function Page() {
       const response = await getAllCategories();
       const parents = response.filter((category) => !category.parentId);
       setCategories(parents);
-    } catch (error) {
+    } catch {
       toast.error("Error fetching categories.");
     }
   };
@@ -50,7 +51,7 @@ export default function Page() {
             ...prev,
             [categoryId]: response,
           }));
-        } catch (error) {
+        } catch{
           toast.error("Error fetching child categories.");
         }
       }
@@ -74,7 +75,7 @@ export default function Page() {
         prev.filter((category) => category.id !== categoryId)
       );
       toast.success("Category deleted successfully");
-    } catch (error) {
+    } catch {
       toast.error("Error deleting category.");
     }
   };

@@ -25,9 +25,15 @@ const CreateDeliveryForm: React.FC = () => {
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
     const { name, value } = e.target;
+    const parsedValue = name === "maxDistance" || name === "baseFee"
+      ? value === "" // If empty, set to empty string
+        ? "" 
+        : Math.max(0, +value) // Ensure no negative values (set to 0 if negative)
+      : value;
+
     setFormData((prevData) => ({
       ...prevData,
-      [name]: name === "maxDistance" || name === "baseFee" ? +value : value,
+      [name]: parsedValue,
     }));
   };
 
@@ -40,7 +46,7 @@ const CreateDeliveryForm: React.FC = () => {
     const updatedPricing = [...formData.pricing];
     updatedPricing[index] = {
       ...updatedPricing[index],
-      [field]: +value,
+      [field]: Math.max(0, +value), // Ensure no negative values
     };
     setFormData((prevData) => ({ ...prevData, pricing: updatedPricing }));
   };
@@ -80,7 +86,6 @@ const CreateDeliveryForm: React.FC = () => {
         baseFee: 0,
         pricing: [],
       });
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
       toast.error("Failed to create delivery.");
     }
@@ -125,9 +130,10 @@ const CreateDeliveryForm: React.FC = () => {
           id="maxDistance"
           name="maxDistance"
           type="number"
-          value={formData.maxDistance}
+          value={formData.maxDistance === 0 ? "" : formData.maxDistance} // Show empty if 0
           onChange={handleChange}
           className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+          min="0" // Ensure no negative values
         />
       </div>
       <div>
@@ -138,9 +144,10 @@ const CreateDeliveryForm: React.FC = () => {
           id="baseFee"
           name="baseFee"
           type="number"
-          value={formData.baseFee}
+          value={formData.baseFee === 0 ? "" : formData.baseFee} // Show empty if 0
           onChange={handleChange}
           className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+          min="0" // Ensure no negative values
         />
       </div>
       <div>
@@ -150,20 +157,22 @@ const CreateDeliveryForm: React.FC = () => {
             <input
               type="number"
               placeholder="Threshold"
-              value={tier.threshold}
+              value={tier.threshold === 0 ? "" : tier.threshold} // Show empty if 0
               onChange={(e) =>
                 handlePricingChange(index, "threshold", e.target.value)
               }
               className="w-1/2 p-2 border rounded"
+              min="0" // Ensure no negative values
             />
             <input
               type="number"
               placeholder="Fee per km"
-              value={tier.feePerKm}
+              value={tier.feePerKm === 0 ? "" : tier.feePerKm} // Show empty if 0
               onChange={(e) =>
                 handlePricingChange(index, "feePerKm", e.target.value)
               }
               className="w-1/2 p-2 border rounded"
+              min="0" // Ensure no negative values
             />
             <button
               type="button"

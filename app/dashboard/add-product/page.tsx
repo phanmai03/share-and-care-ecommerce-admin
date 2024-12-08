@@ -25,8 +25,9 @@ const Page = () => {
   });
 
   const [isAddingVariants, setIsAddingVariants] = useState<boolean>(false);
-  const accessToken = localStorage.getItem('accessToken');
-  const userId = localStorage.getItem('userId')
+  const userId = typeof window !== "undefined" ? localStorage.getItem("userId") || "" : "";
+const accessToken = typeof window !== "undefined" ? localStorage.getItem("accessToken") || "" : "";
+
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();

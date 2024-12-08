@@ -12,8 +12,9 @@ const UserList: React.FC = () => {
   const [userId, setUserId] = useState<string | null>(null);
 
   useEffect(() => {
-    const token = localStorage.getItem("accessToken");
-    const id = localStorage.getItem("userId");
+    const id = typeof window !== "undefined" ? localStorage.getItem("userId") || "" : "";
+    const token = typeof window !== "undefined" ? localStorage.getItem("accessToken") || "" : "";
+    
     setAccessToken(token);
     setUserId(id);
   }, []);
@@ -51,23 +52,23 @@ const UserList: React.FC = () => {
   if (loading) {
     return (
       <div className="flex justify-center items-center h-screen">
-        <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-blue-500"></div>
+        <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-teal-500"></div>
       </div>
     );
   }
 
   return (
-    <div className="container mx-auto p-4">
-      <h1 className="text-3xl font-bold mb-6">User List</h1>
-      <div className="overflow-x-auto bg-white shadow-md rounded-lg">
-        <table className="min-w-full table-auto text-lg">
-          <thead className="bg-teal-500 text-white">
+    <div className="container mx-auto p-6">
+      <h1 className="text-4xl font-semibold mb-8 text-gray-900">User List</h1>
+      <div className="overflow-x-auto bg-white shadow-lg rounded-lg ring-1 ring-gray-200">
+        <table className="min-w-full table-auto text-sm md:text-base text-gray-800">
+          <thead className="bg-teal-600 text-white uppercase">
             <tr>
-              <th className="px-6 py-4 text-left">#</th>
-              <th className="px-6 py-4 text-left">Name</th>
-              <th className="px-6 py-4 text-left">Email</th>
-              <th className="px-6 py-4 text-left">Status</th>
-              <th className="px-6 py-4 text-left">Role</th>
+              <th className="px-6 py-3 text-left font-medium">#</th>
+              <th className="px-6 py-3 text-left font-medium">Name</th>
+              <th className="px-6 py-3 text-left font-medium">Email</th>
+              <th className="px-6 py-3 text-left font-medium">Status</th>
+              <th className="px-6 py-3 text-left font-medium">Role</th>
             </tr>
           </thead>
           <tbody>
@@ -75,24 +76,31 @@ const UserList: React.FC = () => {
               users.map((user, index) => (
                 <tr
                   key={user.id}
-                  className={`${index % 2 === 0 ? "bg-gray-100" : "bg-white"} hover:bg-gray-200 transition duration-200`}
+                  className={`${index % 2 === 0 ? "bg-gray-50" : "bg-white"} hover:bg-gray-100 transition duration-200`}
                 >
                   <td className="px-6 py-4">{index + 1}</td>
                   <td className="px-6 py-4">{user.name}</td>
                   <td className="px-6 py-4">{user.email}</td>
-                  <td className="px-6 py-4">{user.status}</td>
+                  <td className="px-6 py-4">
+                    <span
+                      className={`inline-block py-1 px-3 rounded-full text-sm font-semibold ${
+                        user.status === "active" ? "bg-green-500 text-white" : "bg-yellow-500 text-black"
+                      }`}
+                    >
+                      {user.status}
+                    </span>
+                  </td>
                   <td className="px-6 py-4">{user.role.name}</td>
                 </tr>
               ))
             ) : (
               <tr>
-                <td colSpan={5} className="px-6 py-4 text-center">
+                <td colSpan={5} className="px-6 py-4 text-center text-gray-500">
                   No users found.
                 </td>
               </tr>
             )}
           </tbody>
-
         </table>
       </div>
     </div>

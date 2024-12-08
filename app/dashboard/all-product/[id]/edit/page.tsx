@@ -43,8 +43,9 @@ const Page = () => {
   const param = useParams();
   const id = param.id;
 
-  const accessToken = localStorage.getItem('accessToken');
-  const userId = localStorage.getItem('userId');
+  const userId = typeof window !== "undefined" ? localStorage.getItem("userId") || "" : "";
+  const accessToken = typeof window !== "undefined" ? localStorage.getItem("accessToken") || "" : "";
+  
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -72,7 +73,7 @@ const Page = () => {
             skuList: response.skuList ? transformSkuList(response.skuList.skuList) : [],
           });
         } catch (error) {
-          console.error("Error fetching products:", error);
+          // console.error("Error fetching products:", error);
         } finally {
           setLoading(false);
         }

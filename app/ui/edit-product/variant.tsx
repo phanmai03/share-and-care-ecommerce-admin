@@ -49,8 +49,9 @@ const ProductVariants: React.FC<VariantProps> = ({ formData, setFormData }) => {
     }
   }, [formData]);
 
-  const userId = localStorage.getItem('userId');
-  const accessToken = localStorage.getItem('accessToken');
+  const userId = typeof window !== "undefined" ? localStorage.getItem("userId") || "" : "";
+const accessToken = typeof window !== "undefined" ? localStorage.getItem("accessToken") || "" : "";
+
 
   const updateOption = (variantIndex: number, optionIndex: number, value: string) => {
     const newVariants = [...variants];

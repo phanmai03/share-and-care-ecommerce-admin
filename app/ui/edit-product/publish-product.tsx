@@ -11,8 +11,9 @@ interface PublishProductProps {
 const PublishProduct: React.FC<PublishProductProps> = ({ id, status }) => {
   const [enabled, setEnabled] = useState(false);
 
-  const accessToken = localStorage.getItem('accessToken');
-  const userId = localStorage.getItem('userId');
+  const userId = typeof window !== "undefined" ? localStorage.getItem("userId") || "" : "";
+  const accessToken = typeof window !== "undefined" ? localStorage.getItem("accessToken") || "" : "";
+  
 
   useEffect(() => {
     setEnabled(status === 'PUBLISHED');

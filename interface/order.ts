@@ -18,9 +18,56 @@ export interface ShippingAddress {
     nextStatus: string;
   }
   
-  export interface OrderRespone{
+  export interface OrderResponse{
     totalPages: number;
     totalOrders: number;
     currentPage: number;
     orders: Order[];
   }
+
+
+//##GET DETAIL###
+export interface OrderItem {
+  productId: string;
+  variantId: string;
+  productName: string;
+  variantSlug: string;
+  price: number;
+  image: string;
+  quantity: number;
+}
+
+export interface ShippingAddressDetail {
+  fullname: string;
+  phone: string;
+  city: string;
+  district: string;
+  ward: string;
+  street: string;
+}
+
+export interface DeliveryMethodDetail{
+  name: string;
+  id: string;
+}
+
+export interface OrderMetadata {
+  id: string;
+  userId: string;
+  couponId: string;
+  items: OrderItem[];
+  shippingAddress: ShippingAddressDetail;
+  paymentMethod: string;
+  deliveryMethod: DeliveryMethodDetail;
+  itemsPrice: number;
+  discountPrice: number;
+  shippingPrice: number;
+  totalPrice: number;
+  status: string;
+}
+
+export interface OrderMetaResponse {
+    orders: OrderMetadata;
+}
+
+

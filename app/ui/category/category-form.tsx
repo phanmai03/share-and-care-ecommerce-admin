@@ -16,15 +16,16 @@ export default function CategoryForm({ category, onSubmit }: CategoryFormProps) 
   });
   const [categories, setCategories] = useState<CategoryDataResponse[]>([]);
   const [loading, setLoading] = useState(false);
-  const accessToken = localStorage.getItem('accessToken');
-  const userId = localStorage.getItem('userId');
+  const userId = typeof window !== "undefined" ? localStorage.getItem("userId") || "" : "";
+const accessToken = typeof window !== "undefined" ? localStorage.getItem("accessToken") || "" : "";
+
 
   useEffect(() => {
     const fetchCategories = async () => {
       try {
         const response = await getAllCategories();
         setCategories(response);
-      } catch (error) {
+      } catch{
         toast.error("Failed to fetch categories.");
       }
     };
@@ -86,7 +87,7 @@ export default function CategoryForm({ category, onSubmit }: CategoryFormProps) 
       } else {
         toast.error("Missing ID or access token.");
       }
-    } catch (error) {
+    } catch{
       toast.error("Error submitting category. Please try again.");
     } finally {
       setLoading(false);

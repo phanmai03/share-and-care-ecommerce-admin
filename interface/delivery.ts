@@ -14,11 +14,10 @@ export interface DeliveryDataResponse{
     baseFee: number;
     pricing: Pricing[];
     isActive: boolean;
-    createdAt: string;
-    updatedAt: string;
 }
 
 export interface Pricing {
+    // price: ReactNode;
     threshold: number; 
     feePerKm: number;  
 }

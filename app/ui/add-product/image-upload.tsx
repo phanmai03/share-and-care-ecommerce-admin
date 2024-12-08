@@ -15,8 +15,9 @@ const ImageUpload: React.FC<ImageUploadProps> = ({ formData, setFormData }) => {
   const [loadingMainImage, setLoadingMainImage] = useState<boolean>(false);
   const [loadingSubImage, setLoadingSubImage] = useState<boolean>(false);
 
-  const userId = localStorage.getItem('userId');
-  const accessToken = localStorage.getItem('accessToken');
+  const userId = typeof window !== "undefined" ? localStorage.getItem("userId") || "" : "";
+  const accessToken = typeof window !== "undefined" ? localStorage.getItem("accessToken") || "" : "";
+  
 
   const handleImageChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
