@@ -11,8 +11,8 @@ import Link from "next/link";
 
 const LoginForm = () => {
   const [formData, setFormData] = useState({
-    email: "shareandcaret@gmail.com", // Điền sẵn email
-    password: "ShareAndCare2024",     // Điền sẵn password
+    email: "shareandcaret@gmail.com", // Prefilled email
+    password: "ShareAndCare2024",     // Prefilled password
   });
   const router = useRouter();
   const { setIsLogin } = useAuth();
@@ -21,7 +21,7 @@ const LoginForm = () => {
   useEffect(() => {
     setIsLogin(false);
 
-    // Kiểm tra nếu email và password đã lưu trong localStorage
+    // Check if email and password are already saved in localStorage
     const savedEmail = localStorage.getItem("email");
     const savedPassword = localStorage.getItem("password");
 
@@ -40,9 +40,9 @@ const LoginForm = () => {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setLoading(true); // Bắt đầu loading
+    setLoading(true); // Start loading
     try {
-      // Thực hiện đăng nhập
+      // Attempt to log in
       const response = await loginRequest({
         email: formData.email,
         password: formData.password,
@@ -50,19 +50,19 @@ const LoginForm = () => {
 
       const currentTime = new Date().getTime();
 
-      // Lưu token và thông tin người dùng vào localStorage
+      // Store tokens and user data in localStorage
       localStorage.setItem("accessToken", response.tokens.accessToken);
       localStorage.setItem("refreshToken", response.tokens.refreshToken);
       localStorage.setItem("userId", response.user.id);
       localStorage.setItem("tokenTimestamp", currentTime.toString());
 
-      // Lưu email và password để điền tự động sau
+      // Save email and password for autofill
       localStorage.setItem("email", formData.email);
       localStorage.setItem("password", formData.password);
 
       setIsLogin(true);
 
-      // Kiểm tra nếu người dùng là admin
+      // Check if the user is an admin
       const adminCheck = await checkAdmin(
         response.user.id,
         response.tokens.accessToken
@@ -78,7 +78,7 @@ const LoginForm = () => {
     } catch {
       toast.error("Login failed. Please try again.");
     } finally {
-      setLoading(false); // Dừng loading
+      setLoading(false); // Stop loading
     }
   };
 
@@ -123,25 +123,25 @@ const LoginForm = () => {
                   className="w-full ml-3 text-sm text-gray-700 outline-none"
                   placeholder="Enter your email"
                   onChange={handleChange}
-                  value={formData.email} // Điền sẵn email
+                  value={formData.email} // Prefilled email
                   required
                   autoComplete="email"
                 />
               </div>
             </div>
 
-            {/* Password Input */}
+            {/* Password Input (Visible Password) */}
             <div>
               <label className="block text-gray-700 font-medium mb-2">Password</label>
               <div className="flex items-center border border-gray-300 rounded-md px-3 py-2">
                 <Lock className="text-gray-400" />
                 <input
-                  type="password"
+                  type="text" // Change from "password" to "text" to show the password
                   name="password"
                   className="w-full ml-3 text-sm text-gray-700 outline-none"
                   placeholder="Enter your password"
                   onChange={handleChange}
-                  value={formData.password} // Điền sẵn password
+                  value={formData.password} // Prefilled password
                   required
                   autoComplete="current-password"
                 />
