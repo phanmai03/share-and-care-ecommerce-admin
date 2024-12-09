@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, {useState } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { Mail, Lock } from "lucide-react";
@@ -8,35 +8,18 @@ import { toast } from "react-toastify";
 import { checkAdmin, loginRequest } from "@/app/api/auth";
 import { useAuth } from "@/app/context/AuthContext";
 import Link from "next/link";
-import useDeviceInfo from '@/hooks/useDeviceInfo';
+import useDeviceInfo from "@/hooks/useDeviceInfo";
 
 const LoginForm = () => {
   const [formData, setFormData] = useState({
-    email: "",
-    password: "",
+    email: "shareandcaret@gmail.com", // Pre-filled email
+    password: "ShareAndCare2024", // Pre-filled password
   });
+  const [showPassword, setShowPassword] = useState(false); // State for toggling password visibility
   const router = useRouter();
   const { setIsLogin } = useAuth();
   const [loading, setLoading] = useState(false);
-  const { deviceToken, deviceName, browserName } = useDeviceInfo();
-
-  useEffect(() => {
-    setIsLogin(false);
-    
-    // Check if email and password are already saved in localStorage
-    const savedEmail = localStorage.getItem("email");
-    const savedPassword = localStorage.getItem("password");
-
-    if (savedEmail) {
-      setFormData((prev) => ({ ...prev, email: savedEmail }));
-    }
-    if (savedPassword) {
-      setFormData((prev) => ({ ...prev, password: savedPassword }));
-    }
-  }, [setIsLogin]);
-
-  // const userId = typeof window !== "undefined" ? localStorage.getItem("userId") || "" : "";
-  // const accessToken = typeof window !== "undefined" ? localStorage.getItem("accessToken") || "" : "";
+  const { deviceToken, deviceName } = useDeviceInfo();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -45,9 +28,8 @@ const LoginForm = () => {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setLoading(true); // Start loading
+    setLoading(true);
     try {
-      // Attempt to log in
       const response = await loginRequest({
         email: formData.email,
         password: formData.password,
@@ -56,22 +38,15 @@ const LoginForm = () => {
       });
 
       const currentTime = new Date().getTime();
-
-      // Store tokens and user data in localStorage
       localStorage.setItem("accessToken", response.tokens.accessToken);
       localStorage.setItem("refreshToken", response.tokens.refreshToken);
       localStorage.setItem("userId", response.user.id);
       localStorage.setItem("tokenTimestamp", currentTime.toString());
 
-      // Save email and password to localStorage for auto-filling
-      localStorage.setItem("email", formData.email);
-      localStorage.setItem("password", formData.password);
-
       setIsLogin(true);
 
-      // Check if the user is an admin
       const adminCheck = await checkAdmin(
-        response.user.id, // Use user.id instead of clientId
+        response.user.id,
         response.tokens.accessToken
       );
 
@@ -80,12 +55,12 @@ const LoginForm = () => {
         router.push("/dashboard");
       } else {
         toast.info("You are not an admin. Stay here.");
-        router.push(`/?userId=${response.user.id}&refreshToken=${response.tokens.refreshToken}`);
+        // router.push(`/?userId=${response.user.id}&refreshToken=${response.tokens.refreshToken}`);
       }
     } catch {
       toast.error("Login failed. Please try again.");
     } finally {
-      setLoading(false); // Stop loading
+      setLoading(false);
     }
   };
 
@@ -130,7 +105,7 @@ const LoginForm = () => {
                   className="w-full ml-3 text-sm text-gray-700 outline-none"
                   placeholder="Enter your email"
                   onChange={handleChange}
-                  value={formData.email || ""} // Ensure value is always a string
+                  value={formData.email}
                   required
                   autoComplete="email"
                 />
@@ -143,15 +118,22 @@ const LoginForm = () => {
               <div className="flex items-center border border-gray-300 rounded-md px-3 py-2">
                 <Lock className="text-gray-400" />
                 <input
-                  type="password"
+                  type={showPassword ? "text" : "password"}
                   name="password"
                   className="w-full ml-3 text-sm text-gray-700 outline-none"
                   placeholder="Enter your password"
                   onChange={handleChange}
-                  value={formData.password || ""} // Ensure value is always a string
+                  value={formData.password}
                   required
-                  autoComplete="current-password" // Autofill enabled for password
+                  autoComplete="current-password"
                 />
+                <button
+                  type="button"
+                  className="ml-2 text-sm text-gray-500"
+                  onClick={() => setShowPassword(!showPassword)}
+                >
+                  {showPassword ? "Hide" : "Show"}
+                </button>
               </div>
             </div>
 
