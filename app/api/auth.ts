@@ -67,12 +67,10 @@ export const logoutRequest = async (userId: string, accessToken: string) => {
     }
 };
 
-export const updatePassword = async (data: Auth.ForgotPasswordData, isPanel: boolean) => {
+export const updatePassword = async (data: Auth.ForgotPasswordData) => {
     try {
         // Thêm isPanel vào body của request nếu cần thiết
-        const response = await api.post(`${AUTH_URL}/forgot-password`, {
-            ...data,
-            isPanel,  // Thêm isPanel vào request body nếu cần thiết
+        const response = await api.post(`${AUTH_URL}/forgot-password`, data, {
         });
         return response.data.metadata; // Trả về metadata nếu thành công
     } catch (error) {

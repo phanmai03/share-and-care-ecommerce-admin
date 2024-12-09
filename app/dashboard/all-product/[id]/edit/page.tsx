@@ -21,7 +21,6 @@ const transformSkuList = (skuListData: SkuListData[]): SkuList[] => {
 };
 
 const Page = () => {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [product, setProduct] = useState<ProductDataDetailResponse>();
   const [formData, setFormData] = useState<ProductDataEdit>({
     productId: "",
@@ -45,12 +44,11 @@ const Page = () => {
 
   const userId = typeof window !== "undefined" ? localStorage.getItem("userId") || "" : "";
   const accessToken = typeof window !== "undefined" ? localStorage.getItem("accessToken") || "" : "";
-  
 
   useEffect(() => {
     const fetchProducts = async () => {
       setLoading(true);
-      if (typeof id !== 'string') {
+      if (typeof id !== "string") {
         setLoading(false);
         return;
       }
@@ -73,7 +71,7 @@ const Page = () => {
             skuList: response.skuList ? transformSkuList(response.skuList.skuList) : [],
           });
         } catch {
-          // console.error("Error fetching products:", error);
+          toast.error("Error fetching product details.");
         } finally {
           setLoading(false);
         }
@@ -92,11 +90,7 @@ const Page = () => {
       return;
     }
 
-    const requiredStringFields: (keyof ProductData)[] = [
-      "name",
-      "description",
-      "mainImage",
-    ];
+    const requiredStringFields: (keyof ProductData)[] = ["name", "description", "mainImage"];
 
     for (const field of requiredStringFields) {
       if (!formData[field] || (typeof formData[field] === "string" && formData[field].trim() === "")) {
@@ -116,8 +110,8 @@ const Page = () => {
 
     try {
       await updateProduct({ ...formData }, userId, accessToken);
-      toast.success("Product update successfully!");
-      router.push("/dashboard/all-product")
+      toast.success("Product updated successfully!");
+      router.push("/dashboard/all-product");
     } catch (error) {
       toast.error(`Error updating product: ${error}`);
     }
@@ -126,6 +120,16 @@ const Page = () => {
   return (
     <div className="min-h-screen p-6">
       <Heading title="Edit Product" />
+      <div className="flex justify-between items-center mt-6">
+        {/* Nút Back */}
+        <button
+          type="button"
+          onClick={() => router.back()}
+          className="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg shadow hover:bg-gray-300 transition"
+        >
+          Back
+        </button>
+      </div>
       <div className="flex justify-center items-center mt-6">
         {loading ? (
           <div>Loading...</div>

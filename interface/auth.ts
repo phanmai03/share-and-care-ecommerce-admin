@@ -37,6 +37,7 @@ export interface LoginDataResponse {
 
 export interface ForgotPasswordData {
     email: string;  
+    isPanel: boolean;
 }
 
 export interface ResetPasswordData {

@@ -11,7 +11,8 @@ import {
   ChartNoAxesCombined,
   HousePlus,
   Truck,
-  ShoppingBag
+  ShoppingBag,
+  UserRoundCog
 } from "lucide-react";
 
 // Type the props for Sidebar component
@@ -32,6 +33,7 @@ const Sidebar: React.FC<SidebarProps> = ({ showSidebar, setShowSidebar }) => {
     { title: "User", icon: Users2, href: "/dashboard/user" },
     { title: "Delivery", icon: Truck, href: "/dashboard/delivery" },
     { title: "Orders", icon: ShoppingBag, href: "/dashboard/orders" },
+    { title: "Role", icon: UserRoundCog, href: "/dashboard/role" },
   ];
 
 

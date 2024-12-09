@@ -24,18 +24,23 @@ export default function Page() {
     setLoading(true);
     
     try {
-      const isPanel = JSON.parse(localStorage.getItem("isPanel") || "false");
-
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      const response = await updatePassword(formData, isPanel);
+      // Truyền đúng dữ liệu vào API
+      const data = {
+        email: formData.email,
+        isPanel: true, // Thêm giá trị isPanel
+      };
+      
+      await updatePassword(data); // Gọi API với dữ liệu đúng
+      
       toast.success("A reset password email has been sent to your inbox. Please check your email to receive password reset instructions.");
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    } catch (error) {
+    } catch {
       toast.error("There was an error sending the reset link. Please try again.");
     } finally {
       setLoading(false);
     }
   };
+  
+  
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-blue-100 via-white to-blue-50">

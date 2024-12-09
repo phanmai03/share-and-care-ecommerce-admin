@@ -32,17 +32,24 @@ const Navbar: React.FC<NavbarProps> = ({ setShowSidebar }) => {
       return;
     }
     try {
-      await logoutRequest(userId, accessToken);
-      toast.success("Logout successful.");
-      localStorage.clear(); // Clear all localStorage data
-      router.push("/auth/login");
-    } catch {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const response = await logoutRequest(userId, accessToken);
+      toast.success("Logout successfull.");
+
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    } catch (error) {
       toast.error("An error occurred during logout.");
+    } finally {
+      localStorage.removeItem('accessToken');
+      localStorage.removeItem('refreshToken');
+      localStorage.removeItem('userId');
+      localStorage.removeItem('tokenTimestamp');
+      router.push("/auth/login");
     }
   };
 
   const handleProfileClick = () => router.push("/auth/profile");
-  const handlePasswordUpdate = () => router.push("/auth/update-password");
+  const handlePasswordUpdate = () => router.push("/auth/change-password");
 
   return (
     <div className="flex items-center justify-between lg:justify-end bg-[#38A59F] text-black h-20 fixed top-0 w-full px-4 lg:px-8 z-50 shadow-md">
@@ -92,7 +99,7 @@ const Navbar: React.FC<NavbarProps> = ({ setShowSidebar }) => {
                   } w-full text-left px-4 py-2 text-sm text-gray-700`}
                   onClick={handlePasswordUpdate}
                 >
-                  Update Password
+                  Change Password
                 </button>
               )}
             </Menu.Item>

@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { getDeliveryDetail, updateActive, updateDeactivate, updateDelivery } from '@/app/api/delivery';
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation"; // Ensure useRouter is imported
 import { DeliveryDataResponse, Pricing } from '@/interface/delivery';
 
 const DeliveryDetail = () => {
@@ -24,15 +24,15 @@ const DeliveryDetail = () => {
   const { id } = useParams();
   const deliveryId = typeof id === "string" ? id : "";
 
+  const router = useRouter(); // Declare the router here
+
   useEffect(() => {
     if (deliveryId && userId && accessToken) {
       const fetchDeliveryDetail = async () => {
         try {
           const data = await getDeliveryDetail(deliveryId, userId, accessToken);
-          // console.log("API response for delivery detail: ", data); // Debug log
           setDeliveryData(data);
-        } catch{
-          // console.error("Failed to fetch delivery data:", err);
+        } catch {
           setError("Failed to load delivery data. Please try again.");
         } finally {
           setLoading(false);
@@ -56,8 +56,7 @@ const DeliveryDetail = () => {
       await (action === 'activate' ? updateActive(deliveryId, userId, accessToken) : updateDeactivate(deliveryId, userId, accessToken));
 
       setDeliveryData(prevData => prevData ? { ...prevData, isActive: !prevData.isActive } : prevData);
-    } catch{
-      // console.error("Failed to update status:", err);
+    } catch {
       setError("Failed to update delivery status. Please try again.");
     } finally {
       setIsUpdating(false);
@@ -81,8 +80,7 @@ const DeliveryDetail = () => {
 
       setDeliveryData(updatedData);
       setIsEditing(false);
-    } catch{
-      // console.error("Failed to update delivery data:", err);
+    } catch {
       setError("Failed to update delivery information. Please try again.");
     } finally {
       setIsUpdating(false);
@@ -96,6 +94,14 @@ const DeliveryDetail = () => {
 
   return (
     <div className="max-w-4xl mx-auto p-6 bg-white shadow-lg rounded-lg">
+      <div className="mb-6">
+        <button
+          onClick={() => router.back()} // Ensure router.back() works
+          className="bg-gray-200 text-gray-800 py-2 px-4 rounded-md hover:bg-gray-300 focus:outline-none transition-all"
+        >
+          Back
+        </button>
+      </div>
       <h1 className="text-2xl font-semibold text-gray-800 mb-6">Delivery Detail</h1>
 
       {isEditing ? (

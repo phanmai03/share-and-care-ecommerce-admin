@@ -4,6 +4,7 @@ import React, { useEffect, useState } from "react";
 import { getAllUser } from "@/app/api/user"; // API path
 import { UserData } from "@/interface/user"; // UserData interface
 import { toast } from "react-toastify";
+import BlockUser from "@/app/ui/block-user"; // Import the BlockUser component
 
 const UserList: React.FC = () => {
   const [users, setUsers] = useState<UserData[]>([]);
@@ -14,7 +15,7 @@ const UserList: React.FC = () => {
   useEffect(() => {
     const id = typeof window !== "undefined" ? localStorage.getItem("userId") || "" : "";
     const token = typeof window !== "undefined" ? localStorage.getItem("accessToken") || "" : "";
-    
+
     setAccessToken(token);
     setUserId(id);
   }, []);
@@ -34,8 +35,7 @@ const UserList: React.FC = () => {
         } else {
           toast.error("No users data found in the response.");
         }
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      } catch{
+      } catch {
         toast.error("Failed to load users.");
       } finally {
         setLoading(false);
@@ -48,6 +48,14 @@ const UserList: React.FC = () => {
       setLoading(false);
     }
   }, [accessToken, userId]);
+
+  const updateUserStatus = (id: string, newStatus: string) => {
+    setUsers((prevUsers) =>
+      prevUsers.map((user) =>
+        user.id === id ? { ...user, status: newStatus } : user
+      )
+    );
+  };
 
   if (loading) {
     return (
@@ -69,6 +77,7 @@ const UserList: React.FC = () => {
               <th className="px-6 py-3 text-left font-medium">Email</th>
               <th className="px-6 py-3 text-left font-medium">Status</th>
               <th className="px-6 py-3 text-left font-medium">Role</th>
+              <th className="px-6 py-3 text-left font-medium">Actions</th>
             </tr>
           </thead>
           <tbody>
@@ -83,19 +92,26 @@ const UserList: React.FC = () => {
                   <td className="px-6 py-4">{user.email}</td>
                   <td className="px-6 py-4">
                     <span
-                      className={`inline-block py-1 px-3 rounded-full text-sm font-semibold ${
-                        user.status === "active" ? "bg-green-500 text-white" : "bg-yellow-500 text-black"
-                      }`}
+                      className={`inline-block py-1 px-3 rounded-full text-sm font-semibold ${user.status === "active" ? "bg-green-500 text-white" : "bg-yellow-500 text-black"
+                        }`}
                     >
                       {user.status}
                     </span>
                   </td>
                   <td className="px-6 py-4">{user.role.name}</td>
+                  <td className="px-6 py-4">
+                    {/* Block/Unblock Switch */}
+                    <BlockUser
+                      id={user.id}
+                      status={user.status}
+                      onStatusChange={(newStatus: string) => updateUserStatus(user.id, newStatus)} // Update status after change
+                    />
+                  </td>
                 </tr>
               ))
             ) : (
               <tr>
-                <td colSpan={5} className="px-6 py-4 text-center text-gray-500">
+                <td colSpan={6} className="px-6 py-4 text-center text-gray-500">
                   No users found.
                 </td>
               </tr>

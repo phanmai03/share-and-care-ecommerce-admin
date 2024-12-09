@@ -1,8 +1,8 @@
-"use client"
-import { useEffect, useState } from 'react';
-import { getDeliveryDetail } from '@/app/api/delivery';
-import { useParams } from "next/navigation";
-import { DeliveryDataResponse, Pricing } from '@/interface/delivery';
+"use client";
+import { useEffect, useState } from "react";
+import { getDeliveryDetail } from "@/app/api/delivery";
+import { useParams, useRouter } from "next/navigation";
+import { DeliveryDataResponse, Pricing } from "@/interface/delivery";
 
 const DeliveryDetail = () => {
   const [deliveryData, setDeliveryData] = useState<DeliveryDataResponse | null>(null);
@@ -12,6 +12,7 @@ const DeliveryDetail = () => {
   const userId = typeof window !== "undefined" ? localStorage.getItem("userId") || "" : "";
   const accessToken = typeof window !== "undefined" ? localStorage.getItem("accessToken") || "" : "";
   const { id } = useParams(); 
+  const router = useRouter();
 
   const deliveryId = Array.isArray(id) ? id[0] : id;
 
@@ -21,8 +22,7 @@ const DeliveryDetail = () => {
         try {
           const data = await getDeliveryDetail(deliveryId, userId, accessToken);
           setDeliveryData(data);
-        } catch{
-          // console.error("Failed to fetch delivery data:", err);
+        } catch {
           setError("Failed to load delivery data. Please try again.");
         } finally {
           setLoading(false);
@@ -43,7 +43,18 @@ const DeliveryDetail = () => {
   const pricing = deliveryData?.pricing ?? [];
 
   return (
-    <div className="max-w-4xl mx-auto p-6 bg-white shadow-lg rounded-lg">
+    <div className="max-w-4xl mx-auto p-6 bg-white rounded-lg">
+      {/* Nút Back nằm ngoài form */}
+      <div className="mb-6">
+        <button
+          onClick={() => router.back()}
+          className="bg-gray-200 text-gray-800 py-2 px-4 rounded-md hover:bg-gray-300 focus:outline-none transition-all"
+        >
+          Back
+        </button>
+      </div>
+
+      {/* Form details nằm dưới nút Back */}
       <h1 className="text-2xl font-semibold text-gray-800 mb-6">Delivery Detail</h1>
 
       <table className="min-w-full table-auto border-collapse">
@@ -54,17 +65,13 @@ const DeliveryDetail = () => {
           </tr>
         </thead>
         <tbody>
-          {/* <tr className="border-t">
-            <td className="px-6 py-3 text-sm text-gray-600">Delivery ID</td>
-            <td className="px-6 py-3 text-sm text-gray-800">{deliveryData?.id}</td>
-          </tr> */}
           <tr>
             <td className="px-6 py-3 text-sm text-gray-600">Name</td>
             <td className="px-6 py-3 text-sm text-gray-800">{deliveryData?.name}</td>
           </tr>
           <tr>
             <td className="px-6 py-3 text-sm text-gray-600">Status</td>
-            <td className="px-6 py-3 text-sm text-gray-800">{deliveryData?.isActive ? 'Active' : 'Inactive'}</td>
+            <td className="px-6 py-3 text-sm text-gray-800">{deliveryData?.isActive ? "Active" : "Inactive"}</td>
           </tr>
           <tr>
             <td className="px-6 py-3 text-sm text-gray-600">Description</td>
