@@ -8,19 +8,21 @@ import { toast } from "react-toastify";
 import { checkAdmin, loginRequest } from "@/app/api/auth";
 import { useAuth } from "@/app/context/AuthContext";
 import Link from "next/link";
+import useDeviceInfo from '@/hooks/useDeviceInfo';
 
 const LoginForm = () => {
   const [formData, setFormData] = useState({
-    email: "shareandcaret@gmail.com", // Prefilled email
-    password: "ShareAndCare2024",     // Prefilled password
+    email: "",
+    password: "",
   });
   const router = useRouter();
   const { setIsLogin } = useAuth();
   const [loading, setLoading] = useState(false);
+  const { deviceToken, deviceName, browserName } = useDeviceInfo();
 
   useEffect(() => {
     setIsLogin(false);
-
+    
     // Check if email and password are already saved in localStorage
     const savedEmail = localStorage.getItem("email");
     const savedPassword = localStorage.getItem("password");
@@ -32,6 +34,9 @@ const LoginForm = () => {
       setFormData((prev) => ({ ...prev, password: savedPassword }));
     }
   }, [setIsLogin]);
+
+  // const userId = typeof window !== "undefined" ? localStorage.getItem("userId") || "" : "";
+  // const accessToken = typeof window !== "undefined" ? localStorage.getItem("accessToken") || "" : "";
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -46,6 +51,8 @@ const LoginForm = () => {
       const response = await loginRequest({
         email: formData.email,
         password: formData.password,
+        deviceToken: deviceToken,
+        deviceName: deviceName,
       });
 
       const currentTime = new Date().getTime();
@@ -56,7 +63,7 @@ const LoginForm = () => {
       localStorage.setItem("userId", response.user.id);
       localStorage.setItem("tokenTimestamp", currentTime.toString());
 
-      // Save email and password for autofill
+      // Save email and password to localStorage for auto-filling
       localStorage.setItem("email", formData.email);
       localStorage.setItem("password", formData.password);
 
@@ -64,7 +71,7 @@ const LoginForm = () => {
 
       // Check if the user is an admin
       const adminCheck = await checkAdmin(
-        response.user.id,
+        response.user.id, // Use user.id instead of clientId
         response.tokens.accessToken
       );
 
@@ -123,27 +130,27 @@ const LoginForm = () => {
                   className="w-full ml-3 text-sm text-gray-700 outline-none"
                   placeholder="Enter your email"
                   onChange={handleChange}
-                  value={formData.email} // Prefilled email
+                  value={formData.email || ""} // Ensure value is always a string
                   required
                   autoComplete="email"
                 />
               </div>
             </div>
 
-            {/* Password Input (Visible Password) */}
+            {/* Password Input */}
             <div>
               <label className="block text-gray-700 font-medium mb-2">Password</label>
               <div className="flex items-center border border-gray-300 rounded-md px-3 py-2">
                 <Lock className="text-gray-400" />
                 <input
-                  type="text" // Change from "password" to "text" to show the password
+                  type="password"
                   name="password"
                   className="w-full ml-3 text-sm text-gray-700 outline-none"
                   placeholder="Enter your password"
                   onChange={handleChange}
-                  value={formData.password} // Prefilled password
+                  value={formData.password || ""} // Ensure value is always a string
                   required
-                  autoComplete="current-password"
+                  autoComplete="current-password" // Autofill enabled for password
                 />
               </div>
             </div>
