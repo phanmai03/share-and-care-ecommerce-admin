@@ -8,22 +8,20 @@ import { toast } from "react-toastify";
 import { checkAdmin, loginRequest } from "@/app/api/auth";
 import { useAuth } from "@/app/context/AuthContext";
 import Link from "next/link";
-// import useDeviceInfo from '@/hooks/useDeviceInfo';
 
 const LoginForm = () => {
   const [formData, setFormData] = useState({
-    email: "",
-    password: "",
+    email: "shareandcaret@gmail.com", // Điền sẵn email
+    password: "ShareAndCare2024",     // Điền sẵn password
   });
   const router = useRouter();
   const { setIsLogin } = useAuth();
   const [loading, setLoading] = useState(false);
-  // const { deviceToken, deviceName, browserName } = useDeviceInfo();
 
   useEffect(() => {
     setIsLogin(false);
-    
-    // Check if email and password are already saved in localStorage
+
+    // Kiểm tra nếu email và password đã lưu trong localStorage
     const savedEmail = localStorage.getItem("email");
     const savedPassword = localStorage.getItem("password");
 
@@ -35,9 +33,6 @@ const LoginForm = () => {
     }
   }, [setIsLogin]);
 
-  // const userId = typeof window !== "undefined" ? localStorage.getItem("userId") || "" : "";
-  // const accessToken = typeof window !== "undefined" ? localStorage.getItem("accessToken") || "" : "";
-
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
@@ -45,33 +40,31 @@ const LoginForm = () => {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setLoading(true); // Start loading
+    setLoading(true); // Bắt đầu loading
     try {
-      // Attempt to log in
+      // Thực hiện đăng nhập
       const response = await loginRequest({
         email: formData.email,
         password: formData.password,
-        // deviceToken: deviceToken,
-        // deviceName: deviceName,
       });
 
       const currentTime = new Date().getTime();
 
-      // Store tokens and user data in localStorage
+      // Lưu token và thông tin người dùng vào localStorage
       localStorage.setItem("accessToken", response.tokens.accessToken);
       localStorage.setItem("refreshToken", response.tokens.refreshToken);
       localStorage.setItem("userId", response.user.id);
       localStorage.setItem("tokenTimestamp", currentTime.toString());
 
-      // Save email and password to localStorage for auto-filling
+      // Lưu email và password để điền tự động sau
       localStorage.setItem("email", formData.email);
       localStorage.setItem("password", formData.password);
 
       setIsLogin(true);
 
-      // Check if the user is an admin
+      // Kiểm tra nếu người dùng là admin
       const adminCheck = await checkAdmin(
-        response.user.id, // Use user.id instead of clientId
+        response.user.id,
         response.tokens.accessToken
       );
 
@@ -85,7 +78,7 @@ const LoginForm = () => {
     } catch {
       toast.error("Login failed. Please try again.");
     } finally {
-      setLoading(false); // Stop loading
+      setLoading(false); // Dừng loading
     }
   };
 
@@ -130,7 +123,7 @@ const LoginForm = () => {
                   className="w-full ml-3 text-sm text-gray-700 outline-none"
                   placeholder="Enter your email"
                   onChange={handleChange}
-                  value={formData.email || ""} // Ensure value is always a string
+                  value={formData.email} // Điền sẵn email
                   required
                   autoComplete="email"
                 />
@@ -148,9 +141,9 @@ const LoginForm = () => {
                   className="w-full ml-3 text-sm text-gray-700 outline-none"
                   placeholder="Enter your password"
                   onChange={handleChange}
-                  value={formData.password || ""} // Ensure value is always a string
+                  value={formData.password} // Điền sẵn password
                   required
-                  autoComplete="current-password" // Autofill enabled for password
+                  autoComplete="current-password"
                 />
               </div>
             </div>
