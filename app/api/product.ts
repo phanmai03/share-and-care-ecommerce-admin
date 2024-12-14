@@ -30,7 +30,8 @@ export const getAllProduct = async (
   userId: string,
   accessToken: string,
   page: number,
-  size: number // Đổi Size thành size
+  size: number,
+  query: string // Include the query parameter
 ): Promise<Product.ProductResponse> => {
   try {
     const response = await api.get(PRODUCT_URL, {
@@ -39,12 +40,13 @@ export const getAllProduct = async (
         Authorization: accessToken,
       },
       params: {
-        page, 
-        size, // Truyền tham số phân trang
+        page,
+        size, // Pagination parameters
+        query, // Search parameter
       },
     });
 
-    // Trả về metadata để phân trang
+    // Return metadata containing products and pagination details
     return response.data.metadata;
   } catch (error) {
     const errorMessage = get(error, "response.data.error.message", "");
@@ -130,6 +132,25 @@ export const unPublishProduct = async (id: string, userId: string, accessToken: 
       toast.error(errorMessage);
     }
     throw new Error(errorMessage || 'An unknown error occurred.');
+  }
+};
+
+export const deleteProduct = async (id: string, userId: string, accessToken: string) => {
+  try {
+      const response = await api.delete(`${PRODUCT_URL}/${id}`,{
+          headers: {
+              'x-client-id': userId,
+              'Authorization': accessToken
+          }
+      });
+      return response.data.metadata;
+  } catch (error) {
+      const errorMessage = get(error, 'response.data.error.message', '');
+
+      if (errorMessage) {
+          toast.error(errorMessage);
+      }
+      throw new Error(errorMessage || 'An unknown error occurred.');
   }
 };
 

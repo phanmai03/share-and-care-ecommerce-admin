@@ -11,6 +11,7 @@ import {
 import { GoChevronDown, GoChevronUp } from "react-icons/go";
 import { toast } from "react-toastify";
 import CategoryForm from "@/app/ui/category/category-form";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 
 export default function Page() {
   const [categories, setCategories] = useState<Array<CategoryDataResponse>>([]);
@@ -22,7 +23,7 @@ export default function Page() {
 
   const userId = typeof window !== "undefined" ? localStorage.getItem("userId") || "" : "";
   const accessToken = typeof window !== "undefined" ? localStorage.getItem("accessToken") || "" : "";
-  
+
 
   // Fetch all categories
   const fetchCategories = async () => {
@@ -52,7 +53,7 @@ export default function Page() {
             ...prev,
             [categoryId]: response,
           }));
-        } catch{
+        } catch {
           toast.error("Error fetching child categories.");
         }
       }
@@ -82,25 +83,23 @@ export default function Page() {
   };
 
   return (
-    <div className="flex justify-left items-start min-h-screen bg-gray-100 p-10 mt-10">
-      <div className="bg-white rounded-lg shadow-md p-6 w-full max-w-4xl">
+    <div className="flex justify-left items-start min-h-screenp-10 mt-10">
+      <div className="bg-white rounded-none shadow-lg p-6 w-full max-w-4xl">
         <h2 className="text-lg font-semibold mb-4">Categories</h2>
-        <table className="table-auto w-full text-lg text-left border-collapse">
-          <thead>
-            <tr>
-              {/* <th className="w-1/6 py-2 px-4 border-b">ID</th> */}
-              <th className="w-1/2 py-2 px-4 border-b">Name</th>
-              <th className="w-1/4 py-2 px-4 border-b">Action</th>
-              <th className="w-1/12 py-2 px-4 border-b text-center"></th>
-            </tr>
-          </thead>
-          <tbody>
+        <Table>
+          <TableHeader>
+            <TableRow  className="bg-gray-100">
+              <TableHead className="text-lg">Name</TableHead>
+              <TableHead className="text-lg">Action</TableHead>
+              <TableHead className="text-lg"></TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
             {categories.map((category) => (
               <Fragment key={category.id}>
-                <tr>
-                  {/* <td className="py-2 px-4 border-b">{category.id}</td> */}
-                  <td className="py-2 px-4 border-b">{category.name}</td>
-                  <td className="py-2 px-4 border-b">
+                <TableRow>
+                  <TableCell className="text-lg">{category.name}</TableCell>
+                  <TableCell className="text-lg">
                     <button
                       onClick={() => handleEdit(category)}
                       className="bg-teal-500 text-white p-2 rounded-md mr-2"
@@ -113,49 +112,45 @@ export default function Page() {
                     >
                       <FaTrash />
                     </button>
-                  </td>
-                  <td className="py-2 px-4 border-b text-center">
+                  </TableCell>
+                  <TableCell className="text-lg">
                     <button
                       onClick={() => handleToggleExpand(category.id)}
-                      className="text-black text-cen hover:underline"
+                      className="text-black hover:underline"
                     >
-                      {expandedCategory === category.id ? (
-                        <GoChevronUp />
-                      ) : (
-                        <GoChevronDown />
-                      )}
+                      {expandedCategory === category.id ? <GoChevronUp /> : <GoChevronDown />}
                     </button>
-                  </td>
-                </tr>
+                  </TableCell>
+                </TableRow>
                 {expandedCategory === category.id &&
                   childCategories[category.id]?.map((child) => (
-                    <tr key={child.id} className="bg-slate-400">
-                      {/* <td className="py-2 px-4 border-b pl-8">{child.id}</td> */}
-                      <td className="py-2 px-4 border-b">{child.name}</td>
-                      <td className="py-2 px-4 border-b">
+                    <TableRow key={child.id} className="bg-gray-100">
+                      <TableCell className="text-lg">{child.name}</TableCell>
+                      <TableCell className="text-lg">
                         <button
                           onClick={() => handleEdit(child)}
-                          className="bg-teal-500 text-white p-2 rounded-md mr-2"
+                          className="bg-teal-500  text-white p-2 rounded-lg mr-2"
                         >
                           <FaEdit />
                         </button>
                         <button
                           onClick={() => handleDelete(child.id)}
-                          className="bg-red-500 text-white p-2 rounded-md"
+                          className="bg-red-500 text-white p-2 rounded-lg"
                         >
                           <FaTrash />
                         </button>
-                      </td>
-                      <td className="py-2 px-4 border-b"></td>
-                    </tr>
+                      </TableCell>
+                      <TableCell></TableCell>
+                    </TableRow>
                   ))}
               </Fragment>
             ))}
-          </tbody>
-        </table>
+          </TableBody>
+        </Table>
+
       </div>
 
-      <div className="bg-white rounded-lg shadow-md p-6 w-full max-w-md mx-auto">
+      <div className="bg-white rounded-lgz shadow-md p-6 w-full max-w-md mx-auto">
         <CategoryForm category={editingCategory} onSubmit={fetchCategories} />
       </div>
     </div>

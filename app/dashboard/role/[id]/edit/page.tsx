@@ -1,8 +1,8 @@
 "use client";
-import React, { useState } from "react";
-import { createRole } from "@/app/api/role"; // API call to create role
+import React, { useState, useEffect } from "react";
+import { getRoleDetail, updateRole } from "@/app/api/role"; // API call to update role
 import { toast } from "react-toastify";
-import { useRouter } from "next/navigation";
+import { useRouter, useParams } from "next/navigation";
 
 // Define the RoleData interface
 interface RoleData {
@@ -16,8 +16,7 @@ interface RoleData {
   };
 }
 
-// Explicitly type the category and entity objects
-const categories: ("MANAGE_PRODUCT" |"MANAGE_PRODUCT" | "SYSTEM" | "MANAGE_ORDER" | "SETTING")[] = ["MANAGE_PRODUCT", "SYSTEM", "MANAGE_ORDER", "SETTING"];
+const categories: ("MANAGE_PRODUCT" | "SYSTEM" | "MANAGE_ORDER" | "SETTING")[] = ["MANAGE_PRODUCT", "SYSTEM", "MANAGE_ORDER", "SETTING"];
 const entities: { [key in "MANAGE_PRODUCT" | "SYSTEM" | "MANAGE_ORDER" | "SETTING"]: string[] } = {
   MANAGE_PRODUCT: ["PRODUCT", "CATEGORY", "SKU", "UPLOAD", "COUPON"],
   SYSTEM: ["USER", "ROLE"],
@@ -26,64 +25,70 @@ const entities: { [key in "MANAGE_PRODUCT" | "SYSTEM" | "MANAGE_ORDER" | "SETTIN
 };
 const actions: string[] = ["CREATE", "VIEW", "UPDATE", "DELETE"];
 
-const CreateRole: React.FC = () => {
-  const [roleData, setRoleData] = useState<RoleData>({
-    name: "",
-    permissions: {
-      MANAGE_PRODUCT: {
-        PRODUCT: { CREATE: false, VIEW: false, UPDATE: false, DELETE: false },
-        CATEGORY: { CREATE: false, VIEW: false, UPDATE: false, DELETE: false },
-        SKU: { CREATE: false, VIEW: false, UPDATE: false, DELETE: false },
-        UPLOAD: { CREATE: false, DELETE: false },
-        COUPON: { CREATE: false, VIEW: false, UPDATE: false, DELETE: false },
-      },
-      SYSTEM: {
-        USER: { CREATE: false, VIEW: false, UPDATE: false, DELETE: false },
-        ROLE: { CREATE: false, VIEW: false, UPDATE: false, DELETE: false },
-      },
-      MANAGE_ORDER: {
-        REVIEW: { UPDATE: false, DELETE: false },
-        ORDER: { CREATE: false, VIEW: false, UPDATE: false, DELETE: false },
-      },
-      SETTING: {
-        PAYMENT_TYPE: { CREATE: false, UPDATE: false, DELETE: false },
-        DELIVERY_TYPE: { CREATE: false, VIEW: false, UPDATE: false, DELETE: false },
-        CITY: { CREATE: false, UPDATE: false, DELETE: false },
-      }
-    },
-  });
-
+const EditRole: React.FC = () => {
+  const [roleData, setRoleData] = useState<RoleData | null>(null);
+  const { id } = useParams();
   const router = useRouter();
+
+  useEffect(() => {
+    // Fetch the role data based on the ID passed in the URL
+    const fetchRoleData = async () => {
+      if (id) {
+        try {
+          const userId = localStorage.getItem("userId") || "";
+          const accessToken = localStorage.getItem("accessToken") || "";
+          const roleResponse = await getRoleDetail(id as string, userId, accessToken); // Ensure id is a string
+          setRoleData(roleResponse); // Use directly without `metadata`
+        } catch (error) {
+          console.error('Failed to fetch role data', error);
+          toast.error("Failed to fetch role data");
+        }
+      }
+    };
+
+    fetchRoleData();
+  }, [id]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setRoleData((prev) => ({ ...prev, [name]: value }));
+    setRoleData((prev) => prev ? { ...prev, [name]: value } : null);
   };
 
   const handlePermissionChange = (category: string, entity: string, action: string, value: boolean) => {
     setRoleData((prev) => {
+      if (!prev) return null;
+  
+      // Kiểm tra trước nếu permissions cho category và entity có tồn tại
       const updatedPermissions = { ...prev.permissions };
+      if (!updatedPermissions[category]) updatedPermissions[category] = {};
+      if (!updatedPermissions[category][entity]) updatedPermissions[category][entity] = {};
+  
       updatedPermissions[category][entity][action] = value;
       return { ...prev, permissions: updatedPermissions };
     });
   };
-
+  
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const userId = localStorage.getItem("userId") || "";
     const accessToken = localStorage.getItem("accessToken") || "";
-    try {
-      await createRole(roleData, userId, accessToken);
-      toast.success("Role created successfully");
-      router.push("/dashboard/role"); // Redirect to roles list after creation
-    } catch{
-      toast.error("Failed to create role");
+
+    if (roleData) {
+      try {
+        await updateRole(id as string, roleData, userId, accessToken);
+        toast.success("Role updated successfully");
+        router.push("/dashboard/role"); // Redirect to roles list after update
+      } catch{
+        toast.error("Failed to update role");
+      }
     }
   };
 
+  if (!roleData) return <p>Loading...</p>;
+
   return (
     <div className="container mx-auto p-6 bg-gray-50 rounded-lg shadow-md">
-      <h1 className="text-3xl font-semibold text-center mb-6 text-gray-800">Create Role</h1>
+      <h1 className="text-3xl font-semibold text-center mb-6 text-gray-800">Edit Role</h1>
 
       <form onSubmit={handleSubmit}>
         {/* Role Name Input */}
@@ -117,7 +122,7 @@ const CreateRole: React.FC = () => {
                       <input
                         type="checkbox"
                         id={`${category}-${entity}-${action}`}
-                        checked={roleData.permissions[category][entity][action]}
+                        checked={roleData.permissions[category]?.[entity]?.[action] || false}
                         onChange={(e) =>
                           handlePermissionChange(category, entity, action, e.target.checked)
                         }
@@ -140,7 +145,7 @@ const CreateRole: React.FC = () => {
             type="submit"
             className="bg-teal-500 text-white px-6 py-2 rounded-lg hover:bg-teal-600 focus:outline-none"
           >
-            Create Role
+            Update Role
           </button>
         </div>
       </form>
@@ -148,4 +153,4 @@ const CreateRole: React.FC = () => {
   );
 };
 
-export default CreateRole;
+export default EditRole;

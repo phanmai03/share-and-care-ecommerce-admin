@@ -6,7 +6,6 @@ import { toast } from "react-toastify";
 import { ProductDataDetailResponse } from "@/interface/product"; // Import necessary types
 import BackButton from "@/app/ui/back-button"; // Import the BackButton component
 
-
 const ProductDetailPage = () => {
   const { id } = useParams(); // Get the product ID from the URL
   const [product, setProduct] = useState<ProductDataDetailResponse | null>(null);
@@ -32,7 +31,6 @@ const ProductDetailPage = () => {
           toast.error("Missing authentication information.");
         }
       } catch {
-        // console.error("Error fetching product details:", error);
         toast.error("Error fetching product details.");
       } finally {
         setLoading(false);
@@ -46,35 +44,35 @@ const ProductDetailPage = () => {
 
   // If loading, show loading message
   if (loading) {
-    return <div>Loading...</div>;
+    return <div className="text-center text-lg">Loading...</div>;
   }
 
   // If no product, show error message
   if (!product) {
-    return <div>Product not found.</div>;
+    return <div className="text-center text-lg">Product not found.</div>;
   }
 
   // Render the product detail page
   return (
     <div className="min-h-screen p-6">
       <BackButton previousPathname="/dashboard/all-product" /> {/* Add Back Button */}
-      <div className="max-w-4xl mx-auto bg-white p-6 rounded-lg shadow-lg">
+      <div className="max-w-4xl mx-auto bg-white p-8 rounded-lg shadow-lg">
         <div className="flex flex-col md:flex-row">
           {/* Product Image */}
-          <div className="md:w-1/3 mb-4 md:mb-0">
+          <div className="md:w-1/3 mb-6 md:mb-0">
             <img
               src={product.product.mainImage}
               alt={product.product.name}
-              className="w-full h-auto rounded-lg shadow-lg"
+              className="w-full h-auto rounded-lg shadow-md"
             />
             {/* Sub Images */}
-            <div className="mt-4">
+            <div className="mt-4 flex space-x-2 overflow-x-auto">
               {product.product.subImages.map((image, index) => (
                 <img
                   key={index}
                   src={image}
                   alt={`Product Image ${index + 1}`}
-                  className="w-1/4 mr-2 mb-2 rounded-lg shadow-md"
+                  className="w-16 h-16 rounded-lg shadow-md"
                 />
               ))}
             </div>
@@ -82,37 +80,56 @@ const ProductDetailPage = () => {
 
           {/* Product Details */}
           <div className="md:w-2/3 pl-6">
-            <h1 className="text-2xl font-semibold">{product.product.name}</h1>
+            <h1 className="text-3xl font-semibold text-gray-800">{product.product.name}</h1>
             <div className="flex items-center mt-2">
-              <span className="text-lg font-semibold text-gray-500">{`₫ ${product.product.price.toLocaleString()}`}</span>
-              <span className="line-through ml-4 text-gray-400">{`₫ ${product.product.originalPrice.toLocaleString()}`}</span>
+              <span className="text-xl font-bold text-gray-700 ">{`₫ ${product.product.price.toLocaleString()}`}</span>
+              <span className="line-through ml-4 text-gray-500">{`₫ ${product.product.originalPrice.toLocaleString()}`}</span>
             </div>
-            <p className="mt-4 text-gray-700">{product.product.description}</p>
+            
+            {/* Rating và Views */}
+            <div className="mt-6">
+              <div className="flex items-center">
+                <span className="font-semibold text-gray-800">Rating:</span>{" "}
+                <span className="flex items-center">
+                  {Array.from({ length: 5 }, (_, i) => (
+                    <svg
+                      key={i}
+                      className={`w-5 h-5 ${product.product.rating && i < Math.round(product.product.rating) ? "text-yellow-400" : "text-gray-300"}`}
+                      fill="currentColor"
+                      viewBox="0 0 20 20"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path d="M9.049 2.927a1 1 0 0 1 1.902 0l1.47 4.427a1 1 0 0 0 .95.69h4.667a1 1 0 0 1 .627 1.8l-3.778 2.742a1 1 0 0 0-.368 1.116l1.423 4.206a1 1 0 0 1-1.518 1.13L10 14.585l-3.662 2.222a1 1 0 0 1-1.517-1.13l1.423-4.206a1 1 0 0 0-.368-1.116L2.756 9.823a1 1 0 0 1 .627-1.8h4.667a1 1 0 0 0 .95-.69l1.47-4.427z" />
+                    </svg>
+                  ))}
+                </span>
+              </div>
+              <div className="flex items-center mt-2">
+                <span className="font-semibold text-gray-800">Views:</span>{" "}
+                <span>{product.product.views}</span>
+              </div>
+            </div>
 
-            {/* Category */}
-            <div className="mt-4">
-              <strong>Category:</strong>{" "}
-              {product.product.category.map((cat) => cat.name).join(", ")}
-            </div>
+            <p className="mt-4 text-gray-700">{product.product.description}</p>
 
             {/* Attributes */}
             <div className="mt-4">
-              <strong>Attributes:</strong>{" "}
-              {product.product.attributes.join(", ")}
+              <strong className="text-gray-800">Attributes:</strong>{" "}
+              <span>{product.product.attributes.join(", ")}</span>
             </div>
 
             {/* Variants */}
             <div className="mt-6">
-              <strong>Variants:</strong>
+              <strong className="text-gray-800">Variants:</strong>
               {product.product.variants.map((variant, index) => (
                 <div key={index} className="mt-2">
-                  <div className="font-semibold">{variant.name}</div>
-                  <div className="flex items-center">
+                  <div className="font-semibold text-gray-800">{variant.name}</div>
+                  <div className="flex items-center mt-1">
                     {variant.images.length > 0 && (
                       <img
                         src={variant.images[0]}
                         alt={variant.name}
-                        className="w-10 h-10 rounded-full mr-2"
+                        className="w-12 h-12 rounded-full mr-2"
                       />
                     )}
                     <span>{variant.options.join(", ")}</span>
@@ -124,11 +141,11 @@ const ProductDetailPage = () => {
             {/* Stock and Status */}
             <div className="mt-4">
               <div className="flex items-center">
-                <span className="font-semibold">Quantity:</span>{" "}
+                <span className="font-semibold text-gray-800">Quantity:</span>{" "}
                 <span>{product.product.quantity}</span>
               </div>
               <div className="flex items-center mt-2">
-                <span className="font-semibold">Status:</span>{" "}
+                <span className="font-semibold text-gray-800">Status:</span>{" "}
                 <span>{product.product.status}</span>
               </div>
             </div>

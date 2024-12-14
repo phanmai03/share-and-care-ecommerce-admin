@@ -24,3 +24,31 @@ export const createCoupon = async (data: Coupon.CouponData, userId: string, acce
         throw new Error(errorMessage || 'An unknown error occurred.');
     }
 };
+
+export const getAllCoupon = async (
+    userId: string,
+    accessToken: string,
+    page: number,
+    size: number // Đổi Size thành size
+  ): Promise<Coupon.getAllCouponsResponse> => {
+    try {
+      const response = await api.get(`${COUPON_URL}/all`, {
+        headers: {
+          "x-client-id": userId,
+          Authorization: accessToken,
+        },
+        params: {
+          page, 
+          size, 
+        },
+      });
+      return response.data.metadata;
+    } catch (error) {
+      const errorMessage = get(error, "response.data.error.message", "");
+  
+      if (errorMessage) {
+        toast.error(errorMessage);
+      }
+      throw new Error(errorMessage || "An unknown error occurred.");
+    }
+  };

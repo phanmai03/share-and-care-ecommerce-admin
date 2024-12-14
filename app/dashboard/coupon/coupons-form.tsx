@@ -1,250 +1,155 @@
 "use client";
-
-import { useState } from "react";
+import React, { useEffect, useState } from "react";
+import { getAllCoupon } from "@/app/api/coupon";
 import { toast } from "react-toastify";
-import { createCoupon } from "@/app/api/coupon";
-import * as Coupon from "@/interface/coupon";
+import { getAllCouponsResponse } from "@/interface/coupon";
+import { useRouter } from "next/navigation";
+import { Plus } from "lucide-react";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationEllipsis,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination";
 
-const CreateCoupon = () => {
-
-  // Form state
-  const [formData, setFormData] = useState<Coupon.CouponData>({
-    name: "",
-    code: "",
-    description: "",
-    startDate: "",
-    endDate: "",
-    type: "PERCENT", // Default to "PERCENT"
-    value: 0,
-    minValue: 0,
-    maxValue: 0,
-    maxUses: 0,
-    maxUsesPerUser: 0,
-    targetType: "Order", // Default to "Order"
-    // targetIds: [], // Optional target IDs if needed
-  });
+const CouponList: React.FC = () => {
+  const [coupons, setCoupons] = useState<getAllCouponsResponse | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize] = useState(10);
+  const [isLoading, setIsLoading] = useState(false);
+  const router = useRouter();
 
   const userId = typeof window !== "undefined" ? localStorage.getItem("userId") || "" : "";
   const accessToken = typeof window !== "undefined" ? localStorage.getItem("accessToken") || "" : "";
-  
-  // Handle form changes
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
-  ) => {
-    const { name, value } = e.target;
-  
-    if (
-      ["value", "minValue", "maxValue", "maxUses", "maxUsesPerUser"].includes(name) &&
-      Number(value) < 0
-    ) {
-      toast.error(`${name} cannot be negative.`);
-      return; // Ngăn không cập nhật giá trị
-    }
-  
-    setFormData((prevData) => ({
-      ...prevData,
-      [name]: value,
-    }));
-  };
-  
-  
-  // Handle form submission
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-  
-    // Kiểm tra giá trị âm
-    const negativeFields = ["value", "minValue", "maxValue", "maxUses", "maxUsesPerUser"];
-    for (const field of negativeFields) {
-      if (Number(formData[field as keyof Coupon.CouponData]) < 0) {
-        toast.error(`${field} cannot be negative.`);
-        return; // Ngăn không gửi biểu mẫu
+
+  useEffect(() => {
+    const fetchCoupons = async () => {
+      try {
+        setIsLoading(true);
+        const data = await getAllCoupon(userId, accessToken, currentPage, pageSize);
+        setCoupons(data);
+      } catch (error) {
+        console.error(error);
+        toast.error("Failed to fetch coupons.");
+      } finally {
+        setIsLoading(false);
       }
-    }
-  
-    try {
-      await createCoupon(formData, userId, accessToken); // Directly await and handle success/failure
-      toast.success("Coupon created successfully!");
-    } catch {
-      toast.error("Failed to create coupon.");
-    }
+    };
+
+    fetchCoupons();
+  }, [userId, accessToken, currentPage, pageSize]);
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
   };
-  
-  
+
+  const handleCreate = () => {
+    router.push("coupon/create");
+  };
 
   return (
-    <div className="container mx-auto p-8">
-      <h1 className="text-2xl font-bold mb-6">Create Coupon</h1>
-      <form onSubmit={handleSubmit} className="space-y-6 bg-white p-6 rounded shadow-md">
-        {/* Name */}
-        <div>
-          <label className="block font-medium">Name</label>
-          <input
-            type="text"
-            name="name"
-            value={formData.name}
-            onChange={handleChange}
-            required
-            className="w-full p-2 border rounded"
-          />
-        </div>
+    <div>
+      <h1 className="text-3xl font-bold mb-4">Coupon List</h1>
+      <div className="mb-6 flex justify-end">
+      <button
+          onClick={handleCreate}
+          className="bg-teal-500 text-white py-2 px-6 rounded-lg hover:bg-teal-600 focus:outline-none transition-all duration-300 flex items-center space-x-2"
+        >
+          <Plus size={20} />
+          <span>Create Coupon</span>
+        </button>
+      
+       
+      </div>
+      {isLoading ? (
+        <p>Loading...</p>
+      ) : coupons ? (
+        <div className="container mx-auto mt-6 p-4 bg-white rounded-none shadow-lg">
+          <Table className="min-w-full border-collapse rounded-none">
+            <TableHeader>
+              <TableRow className="bg-gray-100">
+                <TableHead className="text-lg">Name</TableHead>
+                <TableHead className="text-lg">Code</TableHead>
+                <TableHead className="text-lg">Start Date</TableHead>
+                <TableHead className="text-lg">End Date</TableHead>
+                <TableHead className="text-lg">Type</TableHead>
+                <TableHead className="text-lg">Value</TableHead>
+                <TableHead className="text-lg">Target Type</TableHead>
+                <TableHead className="text-lg">Active</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {coupons.coupons.map((coupon) => (
+                <TableRow key={coupon.id}>
+                  <TableCell className="text-lg">{coupon.name}</TableCell>
+                  <TableCell className="text-lg">{coupon.code}</TableCell>
+                  <TableCell className="text-lg">{new Date(coupon.startDate).toLocaleDateString()}</TableCell>
+                  <TableCell className="text-lg">{new Date(coupon.endDate).toLocaleDateString()}</TableCell>
+                  <TableCell className="text-lg">{coupon.type}</TableCell>
+                  <TableCell className="text-lg">{coupon.value}</TableCell>
+                  <TableCell className="text-lg">{coupon.targetType}</TableCell>
+                  <TableCell className="text-lg">{coupon.isActive ? "Yes" : "No"}</TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
 
-        {/* Code */}
-        <div>
-          <label className="block font-medium">Code</label>
-          <input
-            type="text"
-            name="code"
-            value={formData.code}
-            onChange={handleChange}
-            required
-            className="w-full p-2 border rounded"
-          />
-        </div>
+          <Pagination className="mt-4 flex justify-center">
+            <PaginationContent>
+              <PaginationItem>
+                {currentPage > 1 ? (
+                  <PaginationPrevious
+                    href="#"
+                    onClick={() => handlePageChange(currentPage - 1)}
+                  />
+                ) : (
+                  <span className="text-gray-400 cursor-not-allowed">Previous</span>
+                )}
+              </PaginationItem>
 
-        {/* Description */}
-        <div>
-          <label className="block font-medium">Description</label>
-          <textarea
-            name="description"
-            value={formData.description}
-            onChange={handleChange}
-            required
-            className="w-full p-2 border rounded"
-          />
-        </div>
+              {Array.from({ length: coupons.totalPages }, (_, index) => (
+                <PaginationItem key={index}>
+                  <PaginationLink
+                    href="#"
+                    isActive={currentPage === index + 1}
+                    onClick={() => handlePageChange(index + 1)}
+                  >
+                    {index + 1}
+                  </PaginationLink>
+                </PaginationItem>
+              ))}
 
-        {/* Start Date */}
-        <div>
-          <label className="block font-medium">Start Date</label>
-          <input
-            type="date"
-            name="startDate"
-            value={formData.startDate}
-            onChange={handleChange}
-            required
-            className="w-full p-2 border rounded"
-          />
-        </div>
+              {coupons.totalPages > 5 && currentPage < coupons.totalPages - 2 && <PaginationEllipsis />}
 
-        {/* End Date */}
-        <div>
-          <label className="block font-medium">End Date</label>
-          <input
-            type="date"
-            name="endDate"
-            value={formData.endDate}
-            onChange={handleChange}
-            required
-            className="w-full p-2 border rounded"
-          />
+              <PaginationItem>
+                {currentPage < coupons.totalPages ? (
+                  <PaginationNext
+                    href="#"
+                    onClick={() => handlePageChange(currentPage + 1)}
+                  />
+                ) : (
+                  <span className="text-gray-400 cursor-not-allowed">Next</span>
+                )}
+              </PaginationItem>
+            </PaginationContent>
+          </Pagination>
         </div>
-
-        {/* Type */}
-        <div>
-          <label className="block font-medium">Type</label>
-          <select
-            name="type"
-            value={formData.type}
-            onChange={handleChange}
-            className="w-full p-2 border rounded"
-          >
-            <option value="PERCENT">PERCENT</option>
-            {/* Add other options if necessary */}
-            <option value="AMOUNT">AMOUNT</option>
-          </select>
-        </div>
-
-        {/* Value */}
-        <div>
-          <label className="block font-medium">Value</label>
-          <input
-            type="number"
-            name="value"
-            value={formData.value}
-            onChange={handleChange}
-            required
-            className="w-full p-2 border rounded"
-          />
-        </div>
-
-        {/* Min Value */}
-        <div>
-          <label className="block font-medium">Min Value</label>
-          <input
-            type="number"
-            name="minValue"
-            value={formData.minValue}
-            onChange={handleChange}
-            required
-            className="w-full p-2 border rounded"
-          />
-        </div>
-
-        {/* Max Value */}
-        <div>
-          <label className="block font-medium">Max Value</label>
-          <input
-            type="number"
-            name="maxValue"
-            value={formData.maxValue}
-            onChange={handleChange}
-            required
-            className="w-full p-2 border rounded"
-          />
-        </div>
-
-        {/* Max Uses */}
-        <div>
-          <label className="block font-medium">Max Uses</label>
-          <input
-            type="number"
-            name="maxUses"
-            value={formData.maxUses}
-            onChange={handleChange}
-            required
-            className="w-full p-2 border rounded"
-          />
-        </div>
-
-        {/* Max Uses Per User */}
-        <div>
-          <label className="block font-medium">Max Uses Per User</label>
-          <input
-            type="number"
-            name="maxUsesPerUser"
-            value={formData.maxUsesPerUser}
-            onChange={handleChange}
-            required
-            className="w-full p-2 border rounded"
-          />
-        </div>
-
-        {/* Target Type */}
-        <div>
-          <label className="block font-medium">Target Type</label>
-          <select
-            name="targetType"
-            value={formData.targetType}
-            onChange={handleChange}
-            className="w-full p-2 border rounded"
-          >
-            <option value="Order">Order</option>
-            {/* Add other options if necessary */}
-          </select>
-        </div>
-
-        {/* Submit Button */}
-        <div>
-          <button
-            type="submit"
-            className="px-4 py-2 bg-[#38A59F] hover:bg-[#2F8F8A] text-white rounded"
-          >
-            Create Coupon
-          </button>
-        </div>
-      </form>
+      ) : (
+        <p>No coupons found.</p>
+      )}
     </div>
   );
 };
 
-export default CreateCoupon;
+export default CouponList;

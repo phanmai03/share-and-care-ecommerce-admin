@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect} from "react";
+import React, { useState, useEffect } from "react";
 import { toast } from "react-toastify";
 import { createDelivery } from "@/app/api/delivery";
 import * as Delivery from "@/interface/delivery";
@@ -20,16 +20,16 @@ const CreateDeliveryForm: React.FC = () => {
     setUserId(localStorage.getItem("userId"));
   }, []);
 
-  // Handle form field changes
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
     const { name, value } = e.target;
-    const parsedValue = name === "maxDistance" || name === "baseFee"
-      ? value === "" // If empty, set to empty string
-        ? "" 
-        : Math.max(0, +value) // Ensure no negative values (set to 0 if negative)
-      : value;
+    const parsedValue =
+      name === "maxDistance" || name === "baseFee"
+        ? value === ""
+          ? ""
+          : Math.max(0, +value)
+        : value;
 
     setFormData((prevData) => ({
       ...prevData,
@@ -37,7 +37,6 @@ const CreateDeliveryForm: React.FC = () => {
     }));
   };
 
-  // Handle pricing changes
   const handlePricingChange = (
     index: number,
     field: "threshold" | "feePerKm",
@@ -46,12 +45,11 @@ const CreateDeliveryForm: React.FC = () => {
     const updatedPricing = [...formData.pricing];
     updatedPricing[index] = {
       ...updatedPricing[index],
-      [field]: Math.max(0, +value), // Ensure no negative values
+      [field]: Math.max(0, +value),
     };
     setFormData((prevData) => ({ ...prevData, pricing: updatedPricing }));
   };
 
-  // Add a new pricing tier
   const addPricingTier = () => {
     setFormData((prevData) => ({
       ...prevData,
@@ -59,7 +57,6 @@ const CreateDeliveryForm: React.FC = () => {
     }));
   };
 
-  // Remove a pricing tier
   const removePricingTier = (index: number) => {
     setFormData((prevData) => ({
       ...prevData,
@@ -67,7 +64,6 @@ const CreateDeliveryForm: React.FC = () => {
     }));
   };
 
-  // Handle form submission
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -86,119 +82,129 @@ const CreateDeliveryForm: React.FC = () => {
         baseFee: 0,
         pricing: [],
       });
-    } catch{
+    } catch {
       toast.error("Failed to create delivery.");
     }
   };
 
   return (
-
-    <form
-      onSubmit={handleSubmit}
-      className="space-y-4 p-4 bg-white shadow-md rounded-md max-w-md mx-auto"
-    >
-      <div>
-        <label htmlFor="name" className="block text-sm font-medium">
-          Name
-        </label>
-        <input
-          id="name"
-          name="name"
-          value={formData.name}
-          onChange={handleChange}
-          className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
-          placeholder="Enter delivery name"
-        />
-      </div>
-      <div>
-        <label htmlFor="description" className="block text-sm font-medium">
-          Description
-        </label>
-        <textarea
-          id="description"
-          name="description"
-          value={formData.description}
-          onChange={handleChange}
-          className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
-          placeholder="Enter delivery description"
-        />
-      </div>
-      <div>
-        <label htmlFor="maxDistance" className="block text-sm font-medium">
-          Max Distance (km)
-        </label>
-        <input
-          id="maxDistance"
-          name="maxDistance"
-          type="number"
-          value={formData.maxDistance === 0 ? "" : formData.maxDistance} // Show empty if 0
-          onChange={handleChange}
-          className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
-          min="0" // Ensure no negative values
-        />
-      </div>
-      <div>
-        <label htmlFor="baseFee" className="block text-sm font-medium">
-          Base Fee
-        </label>
-        <input
-          id="baseFee"
-          name="baseFee"
-          type="number"
-          value={formData.baseFee === 0 ? "" : formData.baseFee} // Show empty if 0
-          onChange={handleChange}
-          className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
-          min="0" // Ensure no negative values
-        />
-      </div>
-      <div>
-        <label className="block text-sm font-medium">Pricing</label>
-        {formData.pricing.map((tier, index) => (
-          <div key={index} className="flex items-center space-x-2">
-            <input
-              type="number"
-              placeholder="Threshold"
-              value={tier.threshold === 0 ? "" : tier.threshold} // Show empty if 0
-              onChange={(e) =>
-                handlePricingChange(index, "threshold", e.target.value)
-              }
-              className="w-1/2 p-2 border rounded"
-              min="0" // Ensure no negative values
-            />
-            <input
-              type="number"
-              placeholder="Fee per km"
-              value={tier.feePerKm === 0 ? "" : tier.feePerKm} // Show empty if 0
-              onChange={(e) =>
-                handlePricingChange(index, "feePerKm", e.target.value)
-              }
-              className="w-1/2 p-2 border rounded"
-              min="0" // Ensure no negative values
-            />
-            <button
-              type="button"
-              onClick={() => removePricingTier(index)}
-              className="text-red-500"
-            >
-              Remove
-            </button>
-          </div>
-        ))}
-        <button
-          type="button"
-          onClick={addPricingTier}
-          className="mt-2 bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"
-        >
-          Add Pricing Tier
-        </button>
-      </div>
-      <button
-        type="submit"
-        className="w-full bg-indigo-500 text-white py-2 px-4 rounded-md hover:bg-indigo-600 focus:outline-none"
+    <div className="min-h-screen mt-24 flex items-start justify-center bg-gray-100">
+      <form
+        onSubmit={handleSubmit}
+        className="space-y-6 p-6 bg-white shadow-md rounded-lg max-w-lg w-full"
       >
-        Create Delivery
-      </button>
-    </form>
+        <h1 className="text-lg font-bold text-center">Create Delivery</h1>
+        <p className="text-sm text-gray-600 text-center">
+          Fill in the details below to add a new delivery method.
+        </p>
+        <div>
+          <label htmlFor="name" className="block text-sm font-medium">
+            Name
+          </label>
+          <input
+            id="name"
+            name="name"
+            value={formData.name}
+            onChange={handleChange}
+            className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+            placeholder="Enter delivery name"
+          />
+        </div>
+        <div>
+          <label htmlFor="description" className="block text-sm font-medium">
+            Description
+          </label>
+          <textarea
+            id="description"
+            name="description"
+            value={formData.description}
+            onChange={handleChange}
+            className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+            placeholder="Enter delivery description"
+          />
+        </div>
+        <div className="grid grid-cols-2 gap-4">
+          <div>
+            <label htmlFor="maxDistance" className="block text-sm font-medium">
+              Max Distance (km)
+            </label>
+            <input
+              id="maxDistance"
+              name="maxDistance"
+              type="number"
+              value={formData.maxDistance === 0 ? "" : formData.maxDistance}
+              onChange={handleChange}
+              className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+              min="0"
+            />
+          </div>
+          <div>
+            <label htmlFor="baseFee" className="block text-sm font-medium">
+              Base Fee
+            </label>
+            <input
+              id="baseFee"
+              name="baseFee"
+              type="number"
+              value={formData.baseFee === 0 ? "" : formData.baseFee}
+              onChange={handleChange}
+              className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+              min="0"
+            />
+          </div>
+        </div>
+        <div>
+          <label className="block text-sm font-medium">Pricing</label>
+          {formData.pricing.map((tier, index) => (
+            <div
+              key={index}
+              className="flex items-center space-x-2 mt-2 border-b pb-2"
+            >
+              <input
+                type="number"
+                placeholder="Threshold"
+                value={tier.threshold === 0 ? "" : tier.threshold}
+                onChange={(e) =>
+                  handlePricingChange(index, "threshold", e.target.value)
+                }
+                className="w-1/2 p-2 border rounded"
+                min="0"
+              />
+              <input
+                type="number"
+                placeholder="Fee per km"
+                value={tier.feePerKm === 0 ? "" : tier.feePerKm}
+                onChange={(e) =>
+                  handlePricingChange(index, "feePerKm", e.target.value)
+                }
+                className="w-1/2 p-2 border rounded"
+                min="0"
+              />
+              <button
+                type="button"
+                onClick={() => removePricingTier(index)}
+                className="text-red-600 hover:underline"
+              >
+                Remove
+              </button>
+            </div>
+          ))}
+          <button
+            type="button"
+            onClick={addPricingTier}
+            className="mt-3 bg-teal-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+          >
+            Add Pricing Tier
+          </button>
+        </div>
+        <button
+          type="submit"
+          className="w-full bg-teal-600 text-white py-2 px-4 rounded hover:bg-teal-700"
+        >
+          Create Delivery
+        </button>
+      </form>
+    </div>
   );
 };
 

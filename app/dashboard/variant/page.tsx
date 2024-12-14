@@ -1,10 +1,10 @@
 import React, { Suspense } from 'react';
-import Orders from "@/app/dashboard/orders/order-form";
+import Variant from "@/app/dashboard/variant/variant-form";
 
 export default function Page() {
   return (
     <Suspense fallback={<div>Loading...</div>}>
-      <Orders />
+      <Variant />
     </Suspense>
   );
 }

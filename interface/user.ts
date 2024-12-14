@@ -1,8 +1,3 @@
-export interface UserRole {
-    id: string;
-    name: string;
-}
-
 export interface UserData {
     id: string;      
     name: string;    
@@ -25,14 +20,13 @@ export interface blockUser {
     status: string;
 }
 
-//ROLE//
+// ROLE//
 export interface RoleResponse{
     id: string;  
-    role: Role;
+    role: UserRole[];
 }
-
-export interface Role{
-    id: string;  
+export interface UserRole {
+    id: string;
     name: string;
 }
 

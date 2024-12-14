@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { getDeliveryDetail, updateActive, updateDeactivate, updateDelivery } from '@/app/api/delivery';
-import { useParams, useRouter } from "next/navigation"; // Ensure useRouter is imported
+import { useParams, useRouter } from "next/navigation"; 
 import { DeliveryDataResponse, Pricing } from '@/interface/delivery';
 
 const DeliveryDetail = () => {
@@ -17,6 +17,8 @@ const DeliveryDetail = () => {
     maxDistance: '',
     baseFee: '',
   });
+  const [isPricingEditing, setIsPricingEditing] = useState(false);
+  const [pricingData, setPricingData] = useState<Pricing[]>([]);
 
   const userId = typeof window !== "undefined" ? localStorage.getItem("userId") ?? "" : "";
   const accessToken = typeof window !== "undefined" ? localStorage.getItem("accessToken") ?? "" : "";
@@ -24,7 +26,7 @@ const DeliveryDetail = () => {
   const { id } = useParams();
   const deliveryId = typeof id === "string" ? id : "";
 
-  const router = useRouter(); // Declare the router here
+  const router = useRouter();
 
   useEffect(() => {
     if (deliveryId && userId && accessToken) {
@@ -32,6 +34,7 @@ const DeliveryDetail = () => {
         try {
           const data = await getDeliveryDetail(deliveryId, userId, accessToken);
           setDeliveryData(data);
+          setPricingData(data.pricing);
         } catch {
           setError("Failed to load delivery data. Please try again.");
         } finally {
@@ -55,7 +58,7 @@ const DeliveryDetail = () => {
       const action = deliveryData.isActive ? 'deactivate' : 'activate';
       await (action === 'activate' ? updateActive(deliveryId, userId, accessToken) : updateDeactivate(deliveryId, userId, accessToken));
 
-      setDeliveryData(prevData => prevData ? { ...prevData, isActive: !prevData.isActive } : prevData);
+      setDeliveryData(prevData => (prevData ? { ...prevData, isActive: !prevData.isActive } : prevData));
     } catch {
       setError("Failed to update delivery status. Please try again.");
     } finally {
@@ -87,16 +90,26 @@ const DeliveryDetail = () => {
     }
   };
 
+  const handlePricingChange = (index: number, field: string, value: string) => {
+    const updatedPricing = [...pricingData];
+    updatedPricing[index] = { ...updatedPricing[index], [field]: value };
+    setPricingData(updatedPricing);
+  };
+
+  const handlePricingSave = async () => {
+    // Implement your API call to save pricing data here
+    // Example: await updatePricing(deliveryId, userId, accessToken, pricingData);
+    setIsPricingEditing(false);
+  };
+
   if (loading) return <p>Loading...</p>;
   if (error) return <p className="text-red-500">{error}</p>;
-
-  const pricing = deliveryData?.pricing ?? [];
 
   return (
     <div className="max-w-4xl mx-auto p-6 bg-white shadow-lg rounded-lg">
       <div className="mb-6">
         <button
-          onClick={() => router.back()} // Ensure router.back() works
+          onClick={() => router.back()}
           className="bg-gray-200 text-gray-800 py-2 px-4 rounded-md hover:bg-gray-300 focus:outline-none transition-all"
         >
           Back
@@ -144,7 +157,7 @@ const DeliveryDetail = () => {
           <div className="mt-4">
             <button
               onClick={handleSave}
-              className="px-4 py-2 bg-green-500 text-white rounded-md"
+              className="px-4 py-2 bg-teal-500 text-white rounded-md"
               disabled={isUpdating}
             >
               {isUpdating ? 'Saving...' : 'Save'}
@@ -196,7 +209,7 @@ const DeliveryDetail = () => {
           <div className="mb-6">
             <button
               onClick={handleStatusToggle}
-              className={`px-4 py-2 rounded-lg ${isUpdating ? 'bg-gray-300' : deliveryData?.isActive ? 'bg-red-500 hover:bg-red-700' : 'bg-green-500 hover:bg-green-700'} text-white`}
+              className={`px-4 py-2 rounded-lg ${isUpdating ? 'bg-gray-300' : deliveryData?.isActive ? 'bg-red-500 hover:bg-red-700' : 'bg-teal-500 hover:bg-green-700'} text-white`}
               disabled={isUpdating}
             >
               {isUpdating ? 'Updating...' : deliveryData?.isActive ? 'Deactivate' : 'Activate'}
@@ -211,7 +224,7 @@ const DeliveryDetail = () => {
                   baseFee: deliveryData?.baseFee?.toString() || '',
                 });
               }}
-              className="ml-4 px-4 py-2 bg-blue-500 text-white rounded-md"
+              className="ml-4 px-4 py-2 bg-teal-600 text-white rounded-md"
             >
               Edit
             </button>
@@ -221,7 +234,32 @@ const DeliveryDetail = () => {
 
       <div className="mt-6">
         <h2 className="text-lg font-medium text-gray-700">Pricing</h2>
-        {pricing.length > 0 ? (
+        {isPricingEditing ? (
+          <div>
+            {pricingData.map((item, index) => (
+              <div key={index} className="flex space-x-4 mb-2">
+                <input
+                  type="number"
+                  value={item.threshold}
+                  onChange={(e) => handlePricingChange(index, 'threshold', e.target.value)}
+                  className="border rounded p-2"
+                />
+                <input
+                  type="number"
+                  value={item.feePerKm}
+                  onChange={(e) => handlePricingChange(index, 'feePerKm', e.target.value)}
+                  className="border rounded p-2"
+                />
+              </div>
+            ))}
+            <button onClick={handlePricingSave} className="bg-teal-500 text-white rounded p-2">
+              Save Pricing
+            </button>
+            <button onClick={() => setIsPricingEditing(false)} className="bg-red-500 text-white rounded p-2 ml-2">
+              Cancel
+            </button>
+          </div>
+        ) : (
           <table className="min-w-full mt-4 table-auto border-collapse">
             <thead>
               <tr className="bg-gray-100">
@@ -230,7 +268,7 @@ const DeliveryDetail = () => {
               </tr>
             </thead>
             <tbody>
-              {pricing.map((item: Pricing, index: number) => (
+              {pricingData.map((item, index) => (
                 <tr key={index} className="border-t">
                   <td className="px-6 py-3 text-sm text-gray-800">{item.threshold}</td>
                   <td className="px-6 py-3 text-sm text-gray-800">{item.feePerKm} USD</td>
@@ -238,9 +276,10 @@ const DeliveryDetail = () => {
               ))}
             </tbody>
           </table>
-        ) : (
-          <p className="text-gray-500">No pricing available</p>
         )}
+        <button onClick={() => setIsPricingEditing(true)} className="bg-teal-600 text-white rounded p-2 mt-4">
+          Edit Pricing
+        </button>
       </div>
     </div>
   );

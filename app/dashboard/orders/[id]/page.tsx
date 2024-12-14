@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { useParams} from "next/navigation";
+import { useParams } from "next/navigation";
 import { toast } from "react-toastify";
 import { getOrderDetail, updateOrderStatus } from "@/app/api/order"; // Correct API imports
 import { OrderMetadata } from "@/interface/order"; // Correct type import
@@ -33,7 +33,7 @@ const OrderDetailPage: React.FC = () => {
       } else {
         toast.error("Missing authentication information.");
       }
-    } catch{
+    } catch {
       // console.error("Error fetching order details:", error);
       toast.error("Error fetching order details.");
     } finally {
@@ -103,8 +103,11 @@ const OrderDetailPage: React.FC = () => {
                 <Image
                   src={item.image}
                   alt={item.productName}
+                  width={100} // Specify the width
+                  height={100} // Specify the height
                   className="w-16 h-16 object-cover rounded-lg"
                 />
+
                 <div>
                   <h4 className="font-medium">{item.productName} - {item.variantSlug}</h4>
                   <p>Price: ₫ {item.price.toLocaleString()}</p>

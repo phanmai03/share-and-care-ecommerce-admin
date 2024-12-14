@@ -85,6 +85,10 @@ export interface SkuListData {
   status: string;
 }
 
+export interface VariantData{
+  skuList: SkuListData[];
+}
+
 export interface ProductDataDetail {
   id: string;
   name: string;
@@ -149,4 +153,37 @@ export interface UploadProductResponse {
 export interface PublishProductResponse {
   status: string,
   updatedAt: string,
+}
+
+export interface PublicVariantResponse {
+  variant: PublicVariant;
+}
+
+export interface PublicVariant{
+  id: string;
+  name: string;
+  slug: string 
+  status: string;
+}
+
+export interface PublicAllVariant{
+  acknowledged: boolean;
+  modifiedCount: number;
+  upsertedId: string | null;
+  upsertedCount: number;
+  matchedCount: number;
+}
+
+
+export interface SkuListDataPublic {
+  id: string;
+  slug: string;
+  tierIndex: number[];
+  isDefault: boolean;
+  price: number;
+  quantity: number;
+}
+
+export interface VariantDataPublic{
+  skuList: SkuListDataPublic[];
 }

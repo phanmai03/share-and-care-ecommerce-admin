@@ -5,12 +5,26 @@ import { getAllUser } from "@/app/api/user"; // API path
 import { UserData } from "@/interface/user"; // UserData interface
 import { toast } from "react-toastify";
 import BlockUser from "@/app/ui/block-user"; // Import the BlockUser component
+import EditUserModal from "@/app/ui/role/edit"; // Your modal component
+
+import {
+  Table,
+  TableHeader,
+  TableBody,
+  TableRow,
+  TableHead,
+  TableCell,
+} from "@/components/ui/table"; // Updated table components
+import { FaEdit } from "react-icons/fa";
 
 const UserList: React.FC = () => {
   const [users, setUsers] = useState<UserData[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [accessToken, setAccessToken] = useState<string | null>(null);
   const [userId, setUserId] = useState<string | null>(null);
+  const [selectedUser, setSelectedUser] = useState<UserData | null>(null); // State for the selected user to edit
+
+  const handleEdit = (user: UserData) => setSelectedUser(user);
 
   useEffect(() => {
     const id = typeof window !== "undefined" ? localStorage.getItem("userId") || "" : "";
@@ -66,59 +80,76 @@ const UserList: React.FC = () => {
   }
 
   return (
-    <div className="container mx-auto p-6">
-      <h1 className="text-4xl font-semibold mb-8 text-gray-900">User List</h1>
-      <div className="overflow-x-auto bg-white shadow-lg rounded-lg ring-1 ring-gray-200">
-        <table className="min-w-full table-auto text-sm md:text-base text-gray-800">
-          <thead className="bg-teal-600 text-white uppercase">
-            <tr>
-              <th className="px-6 py-3 text-left font-medium">#</th>
-              <th className="px-6 py-3 text-left font-medium">Name</th>
-              <th className="px-6 py-3 text-left font-medium">Email</th>
-              <th className="px-6 py-3 text-left font-medium">Status</th>
-              <th className="px-6 py-3 text-left font-medium">Role</th>
-              <th className="px-6 py-3 text-left font-medium">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
+    <div>
+      <h1 className="text-3xl font-bold mb-8 text-gray-900">User List</h1>
+      <div className="container mx-auto mt-6 p-4 bg-white rounded-none shadow-lg">
+        <Table className="min-w-full border-collapse rounded-none">
+          <TableHeader>
+            <TableRow className="bg-gray-100">
+              <TableHead className="text-lg">Name</TableHead>
+              <TableHead className="text-lg text-left">Email</TableHead>
+              <TableHead className="text-lg text-left">Status</TableHead>
+              <TableHead className="text-lg text-left">Role</TableHead>
+              <TableHead className="text-lg text-left">Actions</TableHead>
+              <TableHead className="text-lg text-left"></TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
             {users.length > 0 ? (
               users.map((user, index) => (
-                <tr
+                <TableRow
                   key={user.id}
                   className={`${index % 2 === 0 ? "bg-gray-50" : "bg-white"} hover:bg-gray-100 transition duration-200`}
                 >
-                  <td className="px-6 py-4">{index + 1}</td>
-                  <td className="px-6 py-4">{user.name}</td>
-                  <td className="px-6 py-4">{user.email}</td>
-                  <td className="px-6 py-4">
+                  <TableCell className="text-lg">{user.name}</TableCell>
+                  <TableCell className="text-lg">{user.email}</TableCell>
+                  <TableCell className="text-lg">
                     <span
-                      className={`inline-block py-1 px-3 rounded-full text-sm font-semibold ${user.status === "active" ? "bg-green-500 text-white" : "bg-yellow-500 text-black"
-                        }`}
+                      className={`inline-block py-1 px-3 rounded-full text-sm font-semibold ${
+                        user.status === "active" ? "bg-green-200 text-green-600" : "bg-gray-300 text-gray-700"
+                      }`}
                     >
                       {user.status}
                     </span>
-                  </td>
-                  <td className="px-6 py-4">{user.role.name}</td>
-                  <td className="px-6 py-4">
-                    {/* Block/Unblock Switch */}
+                  </TableCell>
+                  <TableCell className="text-lg">{user.role.name}</TableCell>
+                  <TableCell className="text-lg">
                     <BlockUser
                       id={user.id}
                       status={user.status}
-                      onStatusChange={(newStatus: string) => updateUserStatus(user.id, newStatus)} // Update status after change
+                      onStatusChange={(newStatus: string) => updateUserStatus(user.id, newStatus)}
                     />
-                  </td>
-                </tr>
+                  </TableCell>
+                  <TableCell className="text-lg">
+                    <button
+                      className="bg-teal-600 text-white p-2 rounded-md"
+                      onClick={() => handleEdit(user)}
+                    >
+                      <FaEdit />
+                    </button>
+                  </TableCell>
+                </TableRow>
               ))
             ) : (
-              <tr>
-                <td colSpan={6} className="px-6 py-4 text-center text-gray-500">
+              <TableRow>
+                <TableCell
+                  colSpan={7}
+                  className="px-6 py-4 text-center text-gray-500"
+                >
                   No users found.
-                </td>
-              </tr>
+                </TableCell>
+              </TableRow>
             )}
-          </tbody>
-        </table>
+          </TableBody>
+        </Table>
       </div>
+      {/* Show modal if selected user exists */}
+      {selectedUser && (
+        <EditUserModal
+          user={selectedUser}
+          onClose={() => setSelectedUser(null)}
+        />
+      )}
     </div>
   );
 };

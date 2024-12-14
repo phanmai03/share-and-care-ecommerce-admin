@@ -7,31 +7,31 @@ interface PropertyProps {
 }
 
 const PropertyForm: React.FC<PropertyProps> = ({ formData, setFormData }) => {
-  const [price, setPrice] = useState<number>(formData.price || 0);
-  const [originalPrice, setOriginalPrice] = useState<number>(formData.originalPrice || 0);
-  const [quantity, setQuantity] = useState<number>(formData.quantity || 0);
+  const [price, setPrice] = useState<number | null>(formData.price || null);
+  const [originalPrice, setOriginalPrice] = useState<number | null>(formData.originalPrice || null);
+  const [quantity, setQuantity] = useState<number | null>(formData.quantity || null);
 
   const handlePriceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const newPrice = parseFloat(e.target.value);
+    const newPrice = e.target.value === "" ? null : parseFloat(e.target.value);
     setPrice(newPrice);
   };
 
   const handleOriginalPriceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const newOriginalPrice = parseFloat(e.target.value);
+    const newOriginalPrice = e.target.value === "" ? null : parseFloat(e.target.value);
     setOriginalPrice(newOriginalPrice);
   };
 
   const handleQuantityChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const newQuantity = parseInt(e.target.value, 10);
+    const newQuantity = e.target.value === "" ? null : parseInt(e.target.value, 10);
     setQuantity(newQuantity);
   };
 
   useEffect(() => {
     setFormData((prevData) => ({
       ...prevData,
-      price,
-      originalPrice,
-      quantity,
+      price: price !== null ? price : 0,
+      originalPrice: originalPrice !== null ? originalPrice : 0,
+      quantity: quantity !== null ? quantity : 0,
     }));
   }, [price, originalPrice, quantity, setFormData]);
 
@@ -42,8 +42,8 @@ const PropertyForm: React.FC<PropertyProps> = ({ formData, setFormData }) => {
         <div>
           <label className="block text-sm font-medium text-gray-700">Original Price</label>
           <input
-            type="number"
-            value={originalPrice}
+            type="text"
+            value={originalPrice !== null ? originalPrice : ""}
             onChange={handleOriginalPriceChange}
             placeholder="Enter original price"
             className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
@@ -53,8 +53,8 @@ const PropertyForm: React.FC<PropertyProps> = ({ formData, setFormData }) => {
         <div>
           <label className="block text-sm font-medium text-gray-700">Discounted Price</label>
           <input
-            type="number"
-            value={price}
+            type="text"
+            value={price !== null ? price : ""}
             onChange={handlePriceChange}
             placeholder="Enter discounted price"
             className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
@@ -64,8 +64,8 @@ const PropertyForm: React.FC<PropertyProps> = ({ formData, setFormData }) => {
         <div>
           <label className="block text-sm font-medium text-gray-700">Quantity in Stock</label>
           <input
-            type="number"
-            value={quantity}
+            type="text"
+            value={quantity !== null ? quantity : ""}
             onChange={handleQuantityChange}
             placeholder="Enter quantity in stock"
             className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"

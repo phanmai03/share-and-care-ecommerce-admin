@@ -87,9 +87,9 @@ export const getRoleDetail = async (id: string, userId: string, accessToken: str
     }
 };
 
-export const updateRole = async (data: RoleData, userId: string, accessToken: string): Promise<Role.RoleDetailResponse> => {
+export const updateRole = async (id: string, data: RoleData ,userId: string, accessToken: string): Promise<Role.RoleDetailResponse> => {
     try {
-      const response = await api.put(`${ROLE_URL}/${data.name}`, data, { // Use 'name' as part of the URL
+      const response = await api.put(`${ROLE_URL}/${id}`,data,{ // Use 'name' as part of the URL
         headers: {
           'x-client-id': userId,
           'Authorization': accessToken,
