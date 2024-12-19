@@ -42,7 +42,7 @@ const PropertyForm: React.FC<PropertyProps> = ({ formData, setFormData }) => {
         <div>
           <label className="block text-sm font-medium text-gray-700">Original Price</label>
           <input
-            type="number"
+            type="text"
             value={originalPrice}
             onChange={handleOriginalPriceChange}
             placeholder="Enter original price"
@@ -53,7 +53,7 @@ const PropertyForm: React.FC<PropertyProps> = ({ formData, setFormData }) => {
         <div>
           <label className="block text-sm font-medium text-gray-700">Discounted Price</label>
           <input
-            type="number"
+            type="text"
             value={price}
             onChange={handlePriceChange}
             placeholder="Enter discounted price"
@@ -64,7 +64,7 @@ const PropertyForm: React.FC<PropertyProps> = ({ formData, setFormData }) => {
         <div>
           <label className="block text-sm font-medium text-gray-700">Quantity in Stock</label>
           <input
-            type="number"
+            type="text"
             value={quantity}
             onChange={handleQuantityChange}
             placeholder="Enter quantity in stock"

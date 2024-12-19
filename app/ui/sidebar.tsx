@@ -1,6 +1,6 @@
 import React from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import Image from "next/image";
 import logo from "../../public/logo.svg";
 import {
@@ -13,7 +13,7 @@ import {
   Truck,
   ShoppingBag,
   UserRoundCog,
-  Package
+  Package,
 } from "lucide-react";
 
 // Type the props for Sidebar component
@@ -24,6 +24,7 @@ interface SidebarProps {
 
 const Sidebar: React.FC<SidebarProps> = ({ showSidebar, setShowSidebar }) => {
   const pathname = usePathname();
+  const router = useRouter();
 
   const sidebarLinks = [
     { title: "Dashboard", icon: ChartNoAxesCombined, href: "/dashboard" },
@@ -38,20 +39,27 @@ const Sidebar: React.FC<SidebarProps> = ({ showSidebar, setShowSidebar }) => {
     { title: "Variant", icon: Package, href: "/dashboard/variant" },
   ];
 
-
+  const handleLogoClick = () => {
+    router.push("/dashboard");
+  };
 
   return (
     <div
-  className={`${
-    showSidebar ? "block" : "hidden"
-  } sm:mt-0 bg-white space-y-6 w-60 h-screen text-lg fixed left-0 min-[0px]:top-20 lg:top-0 shadow-md z-40`}
->
+      className={`${
+        showSidebar ? "block" : "hidden"
+      } sm:mt-0 bg-white space-y-6 w-60 h-screen text-lg fixed left-0 min-[0px]:top-20 lg:top-0 shadow-md z-40`}
+    >
+      {/* Logo Section */}
       <div className="px-6 py-4">
-        <Link href="#">
-          <Image src={logo} alt="Share and Care" className="w-36" />
-        </Link>
+        <Image
+          src={logo}
+          alt="Share and Care"
+          className="w-36 cursor-pointer"
+          onClick={handleLogoClick}
+        />
       </div>
 
+      {/* Sidebar Links */}
       <div className="space-y-3 flex flex-col">
         {sidebarLinks.map((item, i) => (
           <Link

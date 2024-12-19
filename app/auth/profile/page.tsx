@@ -1,4 +1,3 @@
-/* eslint-disable @next/next/no-img-element */
 "use client";
 import React, { useState, useEffect } from "react";
 import { toast } from "react-toastify";
@@ -7,12 +6,11 @@ import { uploadAvatar } from "@/app/api/auth";
 
 export default function UploadAvatarPage() {
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
-  const [avatarUrl, setAvatarUrl] = useState<string | null>(null); // Store the uploaded avatar URL
+  const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
   const [isUploading, setIsUploading] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
-    // Retrieve the current avatar URL from localStorage when the component mounts
     const storedAvatarUrl = localStorage.getItem("avatarUrl");
     if (storedAvatarUrl) {
       setAvatarUrl(storedAvatarUrl);
@@ -23,9 +21,15 @@ export default function UploadAvatarPage() {
     const file = event.target.files?.[0];
     if (file) {
       const maxSize = 2 * 1024 * 1024; // 2MB
+      const allowedTypes = ["image/jpeg", "image/png", "image/gif"]; // Các định dạng hình ảnh hợp lệ
 
       if (file.size > maxSize) {
         toast.error("File size exceeds 2MB.");
+        return;
+      }
+
+      if (!allowedTypes.includes(file.type)) {
+        toast.error("Please select a valid image file (JPEG, PNG, GIF).");
         return;
       }
 
@@ -56,18 +60,21 @@ export default function UploadAvatarPage() {
 
       if (response.image_url) {
         toast.success("Avatar uploaded successfully!");
-        setAvatarUrl(response.image_url); // Set the returned avatar URL
-        localStorage.setItem("avatarUrl", response.image_url); // Store URL in localStorage
+        setAvatarUrl(response.image_url);
+        localStorage.setItem("avatarUrl", response.image_url);
         router.push("/dashboard");
       } else {
         toast.error("Avatar upload failed.");
       }
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    } catch (error) {
+    } catch {
       toast.error("An error occurred during the upload.");
     } finally {
       setIsUploading(false);
     }
+  };
+
+  const handleBack = () => {
+    router.back(); // Quay về trang trước
   };
 
   return (
@@ -85,12 +92,12 @@ export default function UploadAvatarPage() {
               type="file"
               id="avatar"
               name="avatar"
+              accept="image/*"
               onChange={handleImageChange}
               className="file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
             />
           </div>
 
-          {/* Current Avatar Preview */}
           {avatarUrl && !selectedImage && (
             <div className="mt-4 text-center">
               <p className="text-sm text-gray-600 mb-2">Current Avatar:</p>
@@ -102,7 +109,6 @@ export default function UploadAvatarPage() {
             </div>
           )}
 
-          {/* Selected Image Preview */}
           {selectedImage && (
             <div className="mt-4 text-center">
               <p className="text-sm text-gray-600 mb-2">Preview:</p>
@@ -126,6 +132,15 @@ export default function UploadAvatarPage() {
             </button>
           </div>
         </form>
+
+        <div className="mt-4 text-center">
+          <button
+            onClick={handleBack}
+            className="w-full px-4 py-2 rounded-lg bg-gray-200 text-gray-700 hover:bg-gray-300 font-semibold"
+          >
+            Back
+          </button>
+        </div>
       </div>
     </div>
   );

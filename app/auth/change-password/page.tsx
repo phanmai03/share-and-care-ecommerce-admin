@@ -41,7 +41,7 @@ export default function ChangePasswordPage() {
       router.push("/dashboard"); // Chuyển hướng bằng useRouter từ next/navigation
       setFormData({ oldPassword: "", newPassword: "" });
     } catch {
-      toast.error( "Failed to change password. Please try again.");
+      toast.error("Failed to change password. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -98,6 +98,14 @@ export default function ChangePasswordPage() {
             disabled={loading}
           >
             {loading ? "Updating..." : "Change Password"}
+          </button>
+
+          <button
+            type="button"
+            className="mt-4 w-full py-2 px-4 rounded-md font-medium text-gray-700 bg-gray-200 hover:bg-gray-300 transition focus:outline-none focus:ring-2 focus:ring-gray-400"
+            onClick={() => router.back()} // Điều hướng quay lại trang trước
+          >
+            Back
           </button>
         </form>
       </div>

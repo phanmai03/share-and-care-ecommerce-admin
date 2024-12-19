@@ -58,7 +58,7 @@ const LoginForm = () => {
         // router.push(`/?userId=${response.user.id}&refreshToken=${response.tokens.refreshToken}`);
       }
     } catch {
-      toast.error("Login failed. Please try again.");
+      //toast.error("Login failed. Please try again.");
     } finally {
       setLoading(false);
     }
