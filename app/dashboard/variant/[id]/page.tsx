@@ -92,11 +92,11 @@ const VariantDetailPage: React.FC = () => {
     <div>
         <h1 className="text-3xl font-bold">Detail Variant</h1>
         <button
-          onClick={() => router.back()}
-          className="px-6 py-3 rounded-lg"
-        >
-           <ChevronLeft />
-        </button>
+        onClick={() => router.back()} // Alternatively: router.push("/dashboard/role")
+        className="bg-gray-200 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-300 mb-4"
+      >
+        Back
+      </button>
         <div className="container mx-auto mt-6 p-4 bg-white rounded-none shadow-lg">
       <Table className="min-w-full border-collapse rounded-none">
         <TableHeader>
