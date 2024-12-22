@@ -1,7 +1,7 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import { toast } from "react-toastify";
-import { deleteProduct, getAllProduct } from "@/app/api/product";
+import { deleteProduct, getAllProduct, getAllSearchProduct } from "@/app/api/product";
 import { ProductDataResponse, ProductResponse } from "@/interface/product";
 import { useRouter } from "next/navigation";
 import { GrFormView } from "react-icons/gr";
@@ -35,38 +35,34 @@ const ProductList: React.FC = () => {
   const [productToDelete, setProductToDelete] = useState<string | null>(null);
   const router = useRouter();
 
-  const userId =
-    typeof window !== "undefined" ? localStorage.getItem("userId") || "" : "";
-  const accessToken =
-    typeof window !== "undefined" ? localStorage.getItem("accessToken") || "" : "";
+  const userId = typeof window !== "undefined" ? localStorage.getItem("userId") || "" : "";
+  const accessToken = typeof window !== "undefined" ? localStorage.getItem("accessToken") || "" : "";
 
-  const fetchProducts = async (page: number, size: number, query: string) => {
+  const fetchProducts = async (page: number, size: number, searchQuery?: string) => {
     if (!accessToken || !userId) {
       setError("Missing access token or client ID");
       setLoading(false);
       return;
     }
-
+  
     try {
       setLoading(true);
-      const response: ProductResponse = await getAllProduct(
-        userId,
-        accessToken,
-        page,
-        size,
-        query
-      );
-
+      const response: ProductResponse = searchQuery
+        ? await getAllSearchProduct(searchQuery, userId, accessToken, page, size)
+        : await getAllProduct(userId, accessToken, page, size);
+  
       setProducts(response.products || []);
       setTotalProducts(response.totalProducts || 0);
+      setCurrentPage(response.currentPage || 1);
       setError(null);
-    } catch {
+    } catch (error) {
+      console.error("Fetch Error:", error);
       setError("Failed to fetch products");
-      // toast.error(`Error: ${error.message}`);
     } finally {
       setLoading(false);
     }
   };
+  
 
   useEffect(() => {
     fetchProducts(currentPage, pageSize, query);
@@ -78,6 +74,7 @@ const ProductList: React.FC = () => {
       setCurrentPage(page);
     }
   };
+  
 
   const handlePageSizeChange = (size: number) => {
     setPageSize(size);
@@ -113,6 +110,8 @@ const ProductList: React.FC = () => {
     setProductToDelete(null);
   };
 
+  const totalPages = Math.ceil(totalProducts / pageSize);
+
   if (loading) return <p className="text-center">Loading...</p>;
   if (error) return <p className="text-center text-red-500">{error}</p>;
 
@@ -140,19 +139,19 @@ const ProductList: React.FC = () => {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead  className="text-lg">Name</TableHead>
-              <TableHead  className="text-lg">Price</TableHead>
-              <TableHead  className="text-lg">Stock</TableHead>
-              <TableHead  className="text-lg">Rating</TableHead>
-              <TableHead  className="text-lg">Status</TableHead>
-              <TableHead  className="text-lg">Actions</TableHead>
+              <TableHead className="text-lg">Name</TableHead>
+              <TableHead className="text-lg">Price</TableHead>
+              <TableHead className="text-lg">Stock</TableHead>
+              <TableHead className="text-lg">Rating</TableHead>
+              <TableHead className="text-lg">Status</TableHead>
+              <TableHead className="text-lg">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {products.length ? (
               products.map((product) => (
                 <TableRow key={product.id}>
-                  <TableCell  className="text-lg">
+                  <TableCell className="text-lg">
                     <div className="flex items-center space-x-3">
                       <img
                         src={product.mainImage || "/default-image.jpg"}
@@ -162,11 +161,11 @@ const ProductList: React.FC = () => {
                       <span>{product.name}</span>
                     </div>
                   </TableCell>
-                  <TableCell  className="text-lg">{product.price.toLocaleString()} VND</TableCell>
-                  <TableCell  className="text-lg">{product.quantity}</TableCell>
-                  <TableCell  className="text-lg">{product.rating}</TableCell>
-                  <TableCell  className="text-lg">{product.status}</TableCell>
-                  <TableCell  className="text-lg">
+                  <TableCell className="text-lg">{product.price.toLocaleString()} VND</TableCell>
+                  <TableCell className="text-lg">{product.quantity}</TableCell>
+                  <TableCell className="text-lg">{product.rating}</TableCell>
+                  <TableCell className="text-lg">{product.status}</TableCell>
+                  <TableCell className="text-lg">
                     <div className="flex space-x-2">
                       <button
                         onClick={() => handleView(product.id)}
@@ -200,23 +199,26 @@ const ProductList: React.FC = () => {
           </TableBody>
         </Table>
         <Pagination>
-          <PaginationPrevious onClick={() => handlePageChange(currentPage - 1)} />
+          <PaginationPrevious
+            onClick={currentPage === 1 ? undefined : () => handlePageChange(currentPage - 1)}
+          />
           <PaginationContent>
-            {Array.from(
-              { length: Math.ceil(totalProducts / pageSize) },
-              (_, i) => (
-                <PaginationLink
-                  key={i + 1}
-                  isActive={currentPage === i + 1}
-                  onClick={() => handlePageChange(i + 1)}
-                >
-                  {i + 1}
-                </PaginationLink>
-              )
-            )}
+            {Array.from({ length: totalPages }, (_, i) => (
+              <PaginationLink
+                key={i + 1}
+                isActive={currentPage === i + 1}
+                onClick={() => handlePageChange(i + 1)}
+              >
+                {i + 1}
+              </PaginationLink>
+            ))}
           </PaginationContent>
-          <PaginationNext onClick={() => handlePageChange(currentPage + 1)} />
+          <PaginationNext
+            onClick={currentPage === totalPages ? undefined : () => handlePageChange(currentPage + 1)}
+          />
         </Pagination>
+
+  
       </div>
       {isDialogOpen && (
         <ConfirmDeleteDialog onConfirm={confirmDelete} onCancel={cancelDelete} />

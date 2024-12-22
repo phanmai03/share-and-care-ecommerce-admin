@@ -2,8 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { getAllProduct } from "@/app/api/product";
-import { toast } from "react-toastify";
+import { getAllProduct, getAllSearchProduct } from "@/app/api/product";
 import VariantSwitch from "@/app/ui/public-variant";
 import {
   Table,
@@ -16,60 +15,67 @@ import {
 import {
   Pagination,
   PaginationContent,
-  PaginationEllipsis,
-  PaginationItem,
   PaginationLink,
   PaginationNext,
   PaginationPrevious,
 } from "@/components/ui/pagination";
 import { GrFormView } from "react-icons/gr";
+import { ProductDataResponse, ProductResponse } from "@/interface/product";
 
-interface ProductDataResponse {
-  id: string;
-  name: string;
-  slug: string;
-  mainImage: string;
-  price: number;
-  status: string;
-}
 
 const userId = typeof window !== "undefined" ? localStorage.getItem("userId") || "" : "";
 const accessToken = typeof window !== "undefined" ? localStorage.getItem("accessToken") || "" : "";
 
 const ProductListWithVariants: React.FC = () => {
   const [products, setProducts] = useState<ProductDataResponse[]>([]);
-  const [page, setPage] = useState<number>(1);
-  const [size] = useState<number>(5);
-  const [query, setQuery] = useState<string>(""); // State for search query
+  const [, setTotalProducts] = useState<number>(0);
+  const [, setError] = useState<string | null>(null);
+  const [pageSize, setPageSize] = useState(5);
+  const [query] = useState<string>("");
+  const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState<number>(1);
   const [loading, setLoading] = useState<boolean>(true);
 
   const router = useRouter();
+
   const handleView = (id: string) => router.push(`variant/${id}`);
 
-  const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setQuery(e.target.value); // Update the search query
+  const handlePageSizeChange = (size: number) => {
+    setPageSize(size);
+    setCurrentPage(1);
   };
 
-  const fetchProducts = async () => {
+  const fetchProducts = async (page: number, size: number, searchQuery?: string) => {
+    if (!accessToken || !userId) {
+      setError("Missing access token or client ID");
+      setLoading(false);
+      return;
+    }
+
     try {
       setLoading(true);
-      const data = await getAllProduct(userId, accessToken, page, size, query);
-      setProducts(data.products);
-      setTotalPages(data.totalPages);
+      const response: ProductResponse = searchQuery
+        ? await getAllSearchProduct(searchQuery, userId, accessToken, page, size)
+        : await getAllProduct(userId, accessToken, page, size);
+
+      setProducts(response.products || []);
+      setTotalProducts(response.totalProducts || 0);
+      setTotalPages(Math.ceil(response.totalProducts / size));
     } catch {
-      toast.error("Failed to load products. Please try again.");
+      setError("Failed to load products.");
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    fetchProducts();
-  }, [page, query]); // Re-fetch when page or query changes
+    fetchProducts(currentPage, pageSize, query);
+  }, [currentPage, pageSize, query]);
 
-  const handlePageChange = (newPage: number) => {
-    setPage(newPage);
+  const handlePageChange = (page: number) => {
+    if (page > 0 && page <= totalPages) {
+      setCurrentPage(page);
+    }
   };
 
   if (loading) {
@@ -81,14 +87,17 @@ const ProductListWithVariants: React.FC = () => {
       <h1 className="text-3xl font-bold text-gray-800 mb-6">Variant List</h1>
       <div className="container mx-auto mt-6 p-4 bg-white rounded-none shadow-lg">
         {/* Search Input */}
-        <div className="mb-4">
-          <input
-            type="text"
-            placeholder="Search products..."
-            value={query}
-            onChange={handleSearch}
-            className="p-2 border border-gray-300 rounded"
-          />
+        <div className="flex justify-end items-center mb-4">
+          
+          <select
+            value={pageSize}
+            onChange={(e) => handlePageSizeChange(Number(e.target.value))}
+            className="border rounded p-2"
+          >
+            <option value={5}>5</option>
+            <option value={10}>10</option>
+            <option value={25}>25</option>
+          </select>
         </div>
 
         {/* Products Table */}
@@ -134,44 +143,24 @@ const ProductListWithVariants: React.FC = () => {
         </Table>
 
         {/* Pagination */}
-        <Pagination className="mt-4 flex justify-center">
+        <Pagination>
+          <PaginationPrevious
+            onClick={currentPage === 1 ? undefined : () => handlePageChange(currentPage - 1)}
+          />
           <PaginationContent>
-            <PaginationItem>
-              {page > 1 ? (
-                <PaginationPrevious
-                  href="#"
-                  onClick={() => handlePageChange(page - 1)}
-                />
-              ) : (
-                <span className="text-gray-400 cursor-not-allowed">Previous</span>
-              )}
-            </PaginationItem>
-
-            {Array.from({ length: totalPages }, (_, index) => (
-              <PaginationItem key={index}>
-                <PaginationLink
-                  href="#"
-                  isActive={page === index + 1}
-                  onClick={() => handlePageChange(index + 1)}
-                >
-                  {index + 1}
-                </PaginationLink>
-              </PaginationItem>
+            {Array.from({ length: totalPages }, (_, i) => (
+              <PaginationLink
+                key={i + 1}
+                isActive={currentPage === i + 1}
+                onClick={() => handlePageChange(i + 1)}
+              >
+                {i + 1}
+              </PaginationLink>
             ))}
-
-            {totalPages > 5 && page < totalPages - 2 && <PaginationEllipsis />}
-
-            <PaginationItem>
-              {page < totalPages ? (
-                <PaginationNext
-                  href="#"
-                  onClick={() => handlePageChange(page + 1)}
-                />
-              ) : (
-                <span className="text-gray-400 cursor-not-allowed">Next</span>
-              )}
-            </PaginationItem>
           </PaginationContent>
+          <PaginationNext
+            onClick={currentPage === totalPages ? undefined : () => handlePageChange(currentPage + 1)}
+          />
         </Pagination>
       </div>
     </div>

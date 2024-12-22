@@ -62,12 +62,12 @@ const CreateCoupon = () => {
   return (
     <div className="container mx-auto px-4 py-6 max-w-4xl rounded-lg">
       <div className="flex items-center mb-6">
-        <button
-          onClick={() => router.back()}
-          className="px-4 py-2 bg-gray-700 hover:bg-gray-800 text-white rounded-md shadow-md"
-        >
-          Back
-        </button>
+       <button
+        onClick={() => router.back()} // Alternatively: router.push("/dashboard/role")
+        className="bg-gray-200 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-300 mb-4"
+      >
+        Back
+      </button>
         <h1 className="ml-4 text-2xl font-bold text-[#2F8F8A]">Create Coupon</h1>
       </div>
 

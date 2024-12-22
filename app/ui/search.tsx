@@ -1,11 +1,11 @@
 import { IoSearchOutline } from "react-icons/io5";
 
-
 interface SearchBarProps {
   query: string;
   setQuery: (query: string) => void;
   placeholder?: string;
   width?: number;
+  onSearch?: () => void; // Thêm onSearch
 }
 
 export default function SearchBar({
@@ -13,6 +13,7 @@ export default function SearchBar({
   setQuery,
   placeholder = "Search...",
   width,
+  onSearch, // Nhận onSearch
 }: SearchBarProps) {
   return (
     <div className="relative flex items-center" style={{ width }}>
@@ -23,6 +24,7 @@ export default function SearchBar({
         placeholder={placeholder}
         value={query}
         onChange={(e) => setQuery(e.target.value)}
+        onKeyDown={(e) => e.key === "Enter" && onSearch && onSearch()} // Gọi onSearch khi nhấn Enter
         style={{ borderColor: "black" }}
       />
     </div>

@@ -17,6 +17,7 @@ const transformSkuList = (skuListData: SkuListData[]): SkuList[] => {
     isDefault: sku.isDefault,
     price: sku.price,
     quantity: sku.quantity,
+    sold: sku.sold,
   }));
 };
 

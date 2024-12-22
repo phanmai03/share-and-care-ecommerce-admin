@@ -3,6 +3,7 @@ import React, { useState, useEffect } from "react";
 import { toast } from "react-toastify";
 import { createDelivery } from "@/app/api/delivery";
 import * as Delivery from "@/interface/delivery";
+import { useRouter } from "next/navigation";
 
 const CreateDeliveryForm: React.FC = () => {
   const [formData, setFormData] = useState<Delivery.DeliveryData>({
@@ -14,7 +15,7 @@ const CreateDeliveryForm: React.FC = () => {
   });
   const [accessToken, setAccessToken] = useState<string | null>(null);
   const [userId, setUserId] = useState<string | null>(null);
-
+  const router = useRouter();
   useEffect(() => {
     setAccessToken(localStorage.getItem("accessToken"));
     setUserId(localStorage.getItem("userId"));
@@ -88,7 +89,16 @@ const CreateDeliveryForm: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen mt-24 flex items-start justify-center bg-gray-100">
+    <div className="min-h-screen p-6">
+    <button
+    onClick={() => router.back()} // Alternatively: router.push("/dashboard/role")
+    className="bg-gray-200 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-300 mb-4"
+  >
+    Back
+  </button>
+
+    <div className="min-h-screen mt-16 flex items-start justify-center bg-gray-100">
+     
       <form
         onSubmit={handleSubmit}
         className="space-y-6 p-6 bg-white shadow-md rounded-lg max-w-lg w-full"
@@ -204,6 +214,7 @@ const CreateDeliveryForm: React.FC = () => {
           Create Delivery
         </button>
       </form>
+      </div>
     </div>
   );
 };

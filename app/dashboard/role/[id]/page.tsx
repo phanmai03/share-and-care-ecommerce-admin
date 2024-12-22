@@ -1,16 +1,17 @@
 "use client";
 import React, { useEffect, useState } from "react";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { toast } from "react-toastify";
 import { getRoleDetail } from "@/app/api/role"; 
 import { RoleDetailResponse } from "@/interface/role"; 
-import BackButton from "@/app/ui/back-button";
+
 
 const RoleDetail: React.FC = () => {
   const [roleDetail, setRoleDetail] = useState<RoleDetailResponse | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const { id } = useParams();
+  const router = useRouter();
 
   const userId = typeof window !== "undefined" ? localStorage.getItem("userId") || "" : "";
   const accessToken = typeof window !== "undefined" ? localStorage.getItem("accessToken") || "" : "";
@@ -41,7 +42,12 @@ const RoleDetail: React.FC = () => {
 
   return (
     <div className="container mx-auto p-6">
-      <BackButton previousPathname="/dashboard/role" />
+     <button
+        onClick={() => router.back()} // Alternatively: router.push("/dashboard/role")
+        className="bg-gray-200 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-300 mb-4"
+      >
+        Back
+      </button>
 
       <h1 className="text-3xl font-semibold mb-6 text-center text-gray-800">Role Detail</h1>
 

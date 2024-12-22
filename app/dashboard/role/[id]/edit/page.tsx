@@ -31,16 +31,15 @@ const EditRole: React.FC = () => {
   const router = useRouter();
 
   useEffect(() => {
-    // Fetch the role data based on the ID passed in the URL
     const fetchRoleData = async () => {
       if (id) {
         try {
           const userId = localStorage.getItem("userId") || "";
           const accessToken = localStorage.getItem("accessToken") || "";
           const roleResponse = await getRoleDetail(id as string, userId, accessToken); // Ensure id is a string
-          setRoleData(roleResponse); // Use directly without `metadata`
+          setRoleData(roleResponse);
         } catch (error) {
-          console.error('Failed to fetch role data', error);
+          console.error("Failed to fetch role data", error);
           toast.error("Failed to fetch role data");
         }
       }
@@ -51,23 +50,22 @@ const EditRole: React.FC = () => {
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setRoleData((prev) => prev ? { ...prev, [name]: value } : null);
+    setRoleData((prev) => (prev ? { ...prev, [name]: value } : null));
   };
 
   const handlePermissionChange = (category: string, entity: string, action: string, value: boolean) => {
     setRoleData((prev) => {
       if (!prev) return null;
-  
-      // Kiểm tra trước nếu permissions cho category và entity có tồn tại
+
       const updatedPermissions = { ...prev.permissions };
       if (!updatedPermissions[category]) updatedPermissions[category] = {};
       if (!updatedPermissions[category][entity]) updatedPermissions[category][entity] = {};
-  
+
       updatedPermissions[category][entity][action] = value;
       return { ...prev, permissions: updatedPermissions };
     });
   };
-  
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const userId = localStorage.getItem("userId") || "";
@@ -77,8 +75,8 @@ const EditRole: React.FC = () => {
       try {
         await updateRole(id as string, roleData, userId, accessToken);
         toast.success("Role updated successfully");
-        router.push("/dashboard/role"); // Redirect to roles list after update
-      } catch{
+        router.push("/dashboard/role");
+      } catch {
         toast.error("Failed to update role");
       }
     }
@@ -88,6 +86,14 @@ const EditRole: React.FC = () => {
 
   return (
     <div className="container mx-auto p-6 bg-gray-50 rounded-lg shadow-md">
+      {/* Back Button */}
+      <button
+        onClick={() => router.back()} // Alternatively: router.push("/dashboard/role")
+        className="bg-gray-200 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-300 mb-4"
+      >
+        Back
+      </button>
+
       <h1 className="text-3xl font-semibold text-center mb-6 text-gray-800">Edit Role</h1>
 
       <form onSubmit={handleSubmit}>

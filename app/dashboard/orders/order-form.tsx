@@ -34,6 +34,7 @@ const OrderList: React.FC = () => {
 
   const router = useRouter();
   const handleView = (id: string) => router.push(`orders/${id}`);
+  const handleEdit = (id: string) => router.push(`orders/${id}/edit`);
 
   const fetchOrders = async () => {
     try {
@@ -91,8 +92,9 @@ const OrderList: React.FC = () => {
                   <button onClick={() => handleView(order.id)} className="bg-blue-800 text-white p-3 rounded-md">
                     <GrFormView />
                   </button>
+
                   <button
-                    onClick={() => router.push(`delivery/${order.id}/edit`)}
+                    onClick={() => handleEdit(order.id)}
                     className="bg-teal-500 text-white p-3 rounded-md hover:bg-teal-600 transition-colors"
                   >
                     <FaEdit />

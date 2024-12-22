@@ -17,7 +17,12 @@ interface RoleData {
 }
 
 // Explicitly type the category and entity objects
-const categories: ("MANAGE_PRODUCT" |"MANAGE_PRODUCT" | "SYSTEM" | "MANAGE_ORDER" | "SETTING")[] = ["MANAGE_PRODUCT", "SYSTEM", "MANAGE_ORDER", "SETTING"];
+const categories: ("MANAGE_PRODUCT" | "SYSTEM" | "MANAGE_ORDER" | "SETTING")[] = [
+  "MANAGE_PRODUCT",
+  "SYSTEM",
+  "MANAGE_ORDER",
+  "SETTING",
+];
 const entities: { [key in "MANAGE_PRODUCT" | "SYSTEM" | "MANAGE_ORDER" | "SETTING"]: string[] } = {
   MANAGE_PRODUCT: ["PRODUCT", "CATEGORY", "SKU", "UPLOAD", "COUPON"],
   SYSTEM: ["USER", "ROLE"],
@@ -49,7 +54,7 @@ const CreateRole: React.FC = () => {
         PAYMENT_TYPE: { CREATE: false, UPDATE: false, DELETE: false },
         DELIVERY_TYPE: { CREATE: false, VIEW: false, UPDATE: false, DELETE: false },
         CITY: { CREATE: false, UPDATE: false, DELETE: false },
-      }
+      },
     },
   });
 
@@ -60,7 +65,12 @@ const CreateRole: React.FC = () => {
     setRoleData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handlePermissionChange = (category: string, entity: string, action: string, value: boolean) => {
+  const handlePermissionChange = (
+    category: string,
+    entity: string,
+    action: string,
+    value: boolean
+  ) => {
     setRoleData((prev) => {
       const updatedPermissions = { ...prev.permissions };
       updatedPermissions[category][entity][action] = value;
@@ -76,13 +86,21 @@ const CreateRole: React.FC = () => {
       await createRole(roleData, userId, accessToken);
       toast.success("Role created successfully");
       router.push("/dashboard/role"); // Redirect to roles list after creation
-    } catch{
+    } catch {
       toast.error("Failed to create role");
     }
   };
 
   return (
     <div className="container mx-auto p-6 bg-gray-50 rounded-lg shadow-md">
+      {/* Back Button */}
+      <button
+        onClick={() => router.back()}
+        className="mb-4 bg-gray-200 px-4 py-2 rounded-md text-gray-700 hover:bg-gray-300"
+      >
+        Back
+      </button>
+
       <h1 className="text-3xl font-semibold text-center mb-6 text-gray-800">Create Role</h1>
 
       <form onSubmit={handleSubmit}>
@@ -123,7 +141,10 @@ const CreateRole: React.FC = () => {
                         }
                         className="mr-2"
                       />
-                      <label htmlFor={`${category}-${entity}-${action}`} className="text-gray-600">
+                      <label
+                        htmlFor={`${category}-${entity}-${action}`}
+                        className="text-gray-600"
+                      >
                         {action}
                       </label>
                     </div>

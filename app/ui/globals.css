@@ -136,3 +136,15 @@ img {
     @apply bg-background text-foreground;
   }
 }
+
+.sidebar {
+  transition: transform 0.3s ease-in-out;
+}
+
+.sidebar-hidden {
+  transform: translateX(-100%);
+}
+
+.sidebar-visible {
+  transform: translateX(0);
+}

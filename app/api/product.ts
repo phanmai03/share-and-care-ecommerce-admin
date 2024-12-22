@@ -1,4 +1,4 @@
-import * as Product from "@/interface/product"
+import * as   Product from "@/interface/product"
 
 import { toast } from 'react-toastify';
 import api from './index';
@@ -31,18 +31,12 @@ export const getAllProduct = async (
   accessToken: string,
   page: number,
   size: number,
-  query: string // Include the query parameter
 ): Promise<Product.ProductResponse> => {
   try {
-    const response = await api.get(PRODUCT_URL, {
+    const response = await api.get(`${PRODUCT_URL}/?page=${page}&size=${size}`, {
       headers: {
         "x-client-id": userId,
         Authorization: accessToken,
-      },
-      params: {
-        page,
-        size, // Pagination parameters
-        query, // Search parameter
       },
     });
 
@@ -57,6 +51,54 @@ export const getAllProduct = async (
     throw new Error(errorMessage || "An unknown error occurred.");
   }
 };
+
+export const getAllSearchProduct = async (search: string, userId: string, accessToken: string, page: number,
+  size: number): Promise<Product.ProductResponse> => {
+  try {
+      const response = await api.get(`${PRODUCT_URL}/?search=${search}&page=${page}&size=${size}`, {
+        headers: {
+          "x-client-id": userId,
+          Authorization: accessToken,
+        },
+      });
+      return response.data.metadata;
+  } catch (error) {
+      const errorMessage = get(error, 'response.data.error.message', '');
+
+      if (errorMessage) {
+          toast.error(errorMessage);
+      }
+      throw new Error(errorMessage || 'An unknown error occurred.');
+  }
+}
+
+export const getTopCategoriesProduct = async (categoryId: string): Promise<Product.ProductResponse> => {
+  try {
+      const response = await api.get(`${PRODUCT_URL}?size=10&category=${categoryId}`);
+      return response.data.metadata;
+  } catch (error) {
+      const errorMessage = get(error, 'response.data.error.message', '');
+
+      if (errorMessage) {
+          toast.error(errorMessage);
+      }
+      throw new Error(errorMessage || 'An unknown error occurred.');
+  }
+}
+
+export const getPriceFilterProduct = async (minPrice: number, maxPrice: number): Promise<Product.ProductResponse> => {
+  try {
+      const response = await api.get(`${PRODUCT_URL}?minPrice=${minPrice}&maxPrice=${maxPrice}`);
+      return response.data.metadata;
+  } catch (error) {
+      const errorMessage = get(error, 'response.data.error.message', '');
+
+      if (errorMessage) {
+          toast.error(errorMessage);
+      }
+      throw new Error(errorMessage || 'An unknown error occurred.');
+  }
+}
 
 export const getProductDetail = async (id: string, userId: string, accessToken: string): Promise<Product.ProductDataDetailResponse> => {
   try {
