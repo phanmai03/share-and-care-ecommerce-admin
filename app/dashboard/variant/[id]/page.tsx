@@ -14,7 +14,6 @@ import {
   TableHead,
   TableCell,
 } from "@/components/ui/table"; // Import your custom table components
-import { ChevronLeft } from "lucide-react";
 
 interface SkuListData {
   id: string;
