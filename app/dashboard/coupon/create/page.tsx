@@ -54,7 +54,7 @@ const CreateCoupon = () => {
       await createCoupon(sanitizedData, userId, accessToken);
       toast.success("Coupon created successfully!");
       router.back();
-    } catch{
+    } catch {
       toast.error("Failed to create coupon.");
     }
   };
@@ -62,12 +62,12 @@ const CreateCoupon = () => {
   return (
     <div className="container mx-auto px-4 py-6 max-w-4xl rounded-lg">
       <div className="flex items-center mb-6">
-       <button
-        onClick={() => router.back()} // Alternatively: router.push("/dashboard/role")
-        className="bg-gray-200 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-300 mb-4"
-      >
-        Back
-      </button>
+        <button
+          onClick={() => router.back()} // Alternatively: router.push("/dashboard/role")
+          className="bg-gray-200 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-300 mb-4"
+        >
+          Back
+        </button>
         <h1 className="ml-4 text-2xl font-bold text-[#2F8F8A]">Create Coupon</h1>
       </div>
 
@@ -167,6 +167,21 @@ const CreateCoupon = () => {
               </div>
             ))}
           </div>
+          <label className="block text-gray-700 font-medium mb-1">Type</label>
+          <select
+            name="type"
+            value={formData.type}
+            onChange={handleChange}
+            required
+            className="w-full p-3 border rounded-lg shadow-sm focus:outline-none focus:ring focus:ring-[#2F8F8A]"
+          >
+            <option value="PERCENT">Percent</option>
+            <option value="FIXED">Amount</option>
+          </select>
+          <div>
+
+          </div>
+
         </div>
 
         {/* Target Card */}
